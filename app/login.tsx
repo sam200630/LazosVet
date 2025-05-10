@@ -17,15 +17,13 @@ export default function Login() {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
-  // 80% del ancho en web (hasta 400px), 90% en móvil
   const formWidth = isWeb ? Math.min(400, width * 0.8) : width * 0.9;
 
   const handleLogin = () => {
     console.log('Usuario:', username, 'Password:', password);
-    router.replace(Routes.Home);
+    router.replace(Routes.Home);    // /home/home
   };
 
   return (
@@ -78,7 +76,7 @@ export default function Login() {
           No tienes cuenta?{' '}
           <Text
             style={styles.registerLink}
-            onPress={() => router.push(Routes.Register)}
+            onPress={() => router.push(Routes.Register)} // /register
           >
             ¡Regístrate!
           </Text>

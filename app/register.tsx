@@ -19,14 +19,13 @@ export default function Register() {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
   const formWidth = isWeb ? Math.min(400, width * 0.8) : width * 0.9;
 
   const handleRegister = () => {
     console.log('Nombre:', name, 'Teléfono:', phone, 'Correo:', email);
-    router.replace(Routes.Login);
+    router.replace(Routes.Login);   // /login
   };
 
   return (
@@ -99,7 +98,7 @@ export default function Register() {
           Ya tienes cuenta?{' '}
           <Text
             style={styles.registerLink}
-            onPress={() => router.push(Routes.Login)}
+            onPress={() => router.push(Routes.Login)} // /login
           >
             Inicia sesión
           </Text>
