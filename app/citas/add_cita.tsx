@@ -7,19 +7,20 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import { Routes } from '../../route';
 import styles from '../../styles/citas/add_cita';
 
 // Imports estáticos
-import goBackIcon from '../../assets/images/goBack.png';
-import pawIcon    from '../../assets/images/huellaGrande.png';
-import homeIcon   from '../../assets/images/home.png';
-import petbotIcon from '../../assets/images/petbot.png';
-import mediaIcon  from '../../assets/images/media.png';
-import perfilIcon from '../../assets/images/perfil.png';
+import goBackIcon   from '../../assets/images/goBack.png';
+import pawIcon      from '../../assets/images/huellaGrande.png';
+import homeIcon     from '../../assets/images/home.png';
+import petbotIcon   from '../../assets/images/petbot.png';
+import mediaIcon    from '../../assets/images/media.png';
+import perfilIcon   from '../../assets/images/perfil.png';
+import expanderIcon from '../../assets/images/expander.png';
 
 export default function AddAppointment() {
   const router = useRouter();
@@ -29,54 +30,59 @@ export default function AddAppointment() {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
 
-  // AUTO-FORMAT Y VALIDACIÓN DE FECHA
+  const [showPetDropdown, setShowPetDropdown] = useState(false);
+  const [showReasonDropdown, setShowReasonDropdown] = useState(false);
+  const petOptions = ['Titán', 'Milu', 'Bela'];
+  const reasonOptions = ['Baño', 'Consulta', 'Control'];
+
+  // get today's date at midnight
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  // AUTO-FORMAT y bloqueo de fechas anteriores
   const handleDateChange = (text: string) => {
-    // solo dígitos
     const digits = text.replace(/\D/g, '').slice(0, 8);
     let result = '';
-    if (digits.length > 0) {
-      result += digits.slice(0, Math.min(4, digits.length));
-    }
-    if (digits.length >= 5) {
-      result += '-' + digits.slice(4, Math.min(6, digits.length));
-    } else if (digits.length > 4) {
-      result += '-' + digits.slice(4);
-    }
-    if (digits.length >= 7) {
-      result += '-' + digits.slice(6);
+    if (digits.length > 0) result += digits.slice(0, 4);
+    if (digits.length >= 5) result += '-' + digits.slice(4, 6);
+    if (digits.length >= 7) result += '-' + digits.slice(6, 8);
+    // si ya tiene formato completo, validar no anterior a hoy
+    if (result.length === 10) {
+      const [y, m, d] = result.split('-').map(n => parseInt(n,10));
+      const picked = new Date(y, m - 1, d);
+      if (picked < today) {
+        return; // no actualizar
+      }
     }
     setDate(result);
   };
-  const isDateFormatValid = /^\d{4}-\d{2}-\d{2}$/.test(date);
-  const dateParts = date.split('-').map(n => parseInt(n, 10));
-  const dateValid = isDateFormatValid && (() => {
-    const [y, m, d] = dateParts;
+  const isDateValid = /^\d{4}-\d{2}-\d{2}$/.test(date) && (() => {
+    const [y, m, d] = date.split('-').map(n => parseInt(n,10));
     if (m < 1 || m > 12) return false;
-    const maxDay = new Date(y, m, 0).getDate();
-    return d >= 1 && d <= maxDay;
+    const md = new Date(y, m, 0).getDate();
+    return d >= 1 && d <= md;
   })();
 
-  // AUTO-FORMAT Y VALIDACIÓN DE HORA MILITAR 08:00–18:00
+  // AUTO-FORMAT y validación de hora 08:00–17:30
   const handleTimeChange = (text: string) => {
     const digits = text.replace(/\D/g, '').slice(0, 4);
     let result = digits;
-    if (digits.length >= 3) {
-      result = digits.slice(0,2) + ':' + digits.slice(2);
-    }
+    if (digits.length >= 3) result = digits.slice(0, 2) + ':' + digits.slice(2);
     setTime(result);
   };
-  const isTimeFormatValid = /^[0-2]\d:[0-5]\d$/.test(time);
-  const timeValid = isTimeFormatValid && (() => {
+  const isTimeValid = /^[0-2]\d:[0-5]\d$/.test(time) && (() => {
     const [h, m] = time.split(':').map(n => parseInt(n,10));
-    return h >= 8 && h <= 18;
+    if (h < 8 || h > 17) return false;
+    if (h === 17 && m > 30) return false;
+    return true;
   })();
 
-  const isValid = pet !== '' && reason !== '' && dateValid && timeValid;
+  const isValid = !!(pet && reason && isDateValid && isTimeValid);
 
   const tabs = [
-    { icon: homeIcon,   label: 'Home',    route: Routes.Home },
-    { icon: petbotIcon, label: 'Pet bot', route: Routes.Home },
-    { icon: mediaIcon,  label: 'Media',   route: Routes.Home },
+    { icon: homeIcon,   label: 'Home',    route: Routes.Home   },
+    { icon: petbotIcon, label: 'Pet bot', route: Routes.Home   },
+    { icon: mediaIcon,  label: 'Media',   route: Routes.Home   },
     { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil },
   ];
 
@@ -85,45 +91,72 @@ export default function AddAppointment() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      {/* Flecha atrás */}
-      <TouchableOpacity style={styles.goBack} onPress={() => router.back()}>
-        <Image source={goBackIcon} style={styles.goBackIcon} />
-      </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.form}>
+        {/* Flecha atrás */}
+        <TouchableOpacity style={styles.goBack} onPress={() => router.back()}>
+          <Image source={goBackIcon} style={styles.goBackIcon} />
+        </TouchableOpacity>
 
-      {/* Huella grande */}
-      <Image source={pawIcon} style={styles.paw} />
+        {/* Huella grande */}
+        <Image source={pawIcon} style={styles.paw} />
 
-      <Text style={styles.title}>Añadir cita</Text>
+        <Text style={styles.title}>Añadir cita</Text>
 
-      <View style={styles.form}>
+        {/* Mascota */}
         <Text style={styles.label}>Mascota</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={pet}
-            onValueChange={setPet}
-            style={styles.picker}
+        <View style={styles.selectorWrapper}>
+          <TouchableOpacity
+            style={styles.selectorContainer}
+            onPress={() => setShowPetDropdown(v => !v)}
           >
-            <Picker.Item label="Selecciona mascota" value="" />
-            <Picker.Item label="Titán" value="Titán" />
-            <Picker.Item label="Milu"  value="Milu" />
-            <Picker.Item label="Bela"  value="Bela" />
-          </Picker>
+            <Text style={pet ? styles.selectorText : styles.selectorPlaceholder}>
+              {pet || 'Selecciona mascota'}
+            </Text>
+            <Image source={expanderIcon} style={styles.expanderIcon} />
+          </TouchableOpacity>
+          {showPetDropdown && (
+            <View style={styles.dropdown}>
+              {petOptions.map(o => (
+                <TouchableOpacity
+                  key={o}
+                  style={styles.option}
+                  onPress={() => { setPet(o); setShowPetDropdown(false); }}
+                >
+                  <Text style={styles.optionText}>{o}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
 
+        {/* Motivo */}
         <Text style={styles.label}>Motivo de la cita</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={reason}
-            onValueChange={setReason}
-            style={styles.picker}
+        <View style={styles.selectorWrapper}>
+          <TouchableOpacity
+            style={styles.selectorContainer}
+            onPress={() => setShowReasonDropdown(v => !v)}
           >
-            <Picker.Item label="Selecciona motivo" value="" />
-            <Picker.Item label="Baño"      value="Baño" />
-            <Picker.Item label="Consulta"  value="Consulta" />
-            <Picker.Item label="Control"   value="Control" />
-          </Picker>
+            <Text style={reason ? styles.selectorText : styles.selectorPlaceholder}>
+              {reason || 'Selecciona motivo'}
+            </Text>
+            <Image source={expanderIcon} style={styles.expanderIcon} />
+          </TouchableOpacity>
+          {showReasonDropdown && (
+            <View style={styles.dropdown}>
+              {reasonOptions.map(o => (
+                <TouchableOpacity
+                  key={o}
+                  style={styles.option}
+                  onPress={() => { setReason(o); setShowReasonDropdown(false); }}
+                >
+                  <Text style={styles.optionText}>{o}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
 
+        {/* Recomendaciones */}
         <Text style={styles.label}>Recomendaciones adicionales</Text>
         <TextInput
           style={[styles.input, styles.extraInput]}
@@ -135,13 +168,14 @@ export default function AddAppointment() {
           onChangeText={setExtra}
         />
 
+        {/* Fecha & Hora */}
         <View style={styles.row}>
           <View style={styles.half}>
             <Text style={styles.label}>Fecha (YYYY-MM-DD)</Text>
             <TextInput
               style={[
                 styles.input,
-                date.length === 10 && !dateValid ? { borderColor: 'red' } : {},
+                date.length === 10 && !isDateValid ? { borderColor: 'red' } : {},
               ]}
               placeholder="2025-05-30"
               placeholderTextColor="#999"
@@ -151,13 +185,13 @@ export default function AddAppointment() {
             />
           </View>
           <View style={styles.half}>
-            <Text style={styles.label}>Hora (HH:MM)</Text>
+            <Text style={styles.label}>Hora</Text>
             <TextInput
               style={[
                 styles.input,
-                time.length === 5 && !timeValid ? { borderColor: 'red' } : {},
+                time.length === 5 && !isTimeValid ? { borderColor: 'red' } : {},
               ]}
-              placeholder="14:30"
+              placeholder="Horario de 8:00am-5:30pm"
               placeholderTextColor="#999"
               keyboardType="numeric"
               value={time}
@@ -173,7 +207,7 @@ export default function AddAppointment() {
         >
           <Text style={styles.buttonText}>Generar confirmación</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
 
       {/* Bottom Tabs */}
       <View style={styles.tabBar}>

@@ -10,7 +10,8 @@ import {
   Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import styles from '../../styles/perfil/perfil';
+import styles, { TAB_BAR_HEIGHT } from '../../styles/perfil/perfil';
+import { Routes } from '../../route';
 
 // imágenes estáticas
 import goBackIcon   from '../../assets/images/goBack.png';
@@ -22,17 +23,14 @@ import homeIcon     from '../../assets/images/home.png';
 import petbotIcon   from '../../assets/images/petbot.png';
 import mediaIcon    from '../../assets/images/media.png';
 import perfilIcon   from '../../assets/images/perfil.png';
-import { Routes }   from '../../route';
 
 export default function Perfil() {
   const router = useRouter();
 
-  // estados de edición
   const [editingName, setEditingName]   = useState(false);
   const [editingEmail, setEditingEmail] = useState(false);
   const [name, setName]                 = useState('Samuel Rodriguez');
   const [email, setEmail]               = useState('samuel@gmail.com');
-
   const pets = ['Titán', 'Bela'];
 
   const tabs = [
@@ -44,7 +42,7 @@ export default function Perfil() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Flecha atrás: ahora siempre lleva a Home */}
+      {/* Flecha atrás */}
       <TouchableOpacity
         style={styles.goBack}
         onPress={() => router.replace(Routes.Home)}
@@ -52,13 +50,18 @@ export default function Perfil() {
         <Image source={goBackIcon} style={styles.goBackIcon} />
       </TouchableOpacity>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: TAB_BAR_HEIGHT + 24
+        }}
+      >
         <Text style={styles.title}>Hello, Samu</Text>
 
         <View style={styles.profilePicContainer}>
           <View style={styles.profilePic} />
         </View>
 
+        {/* Información personal */}
         <Text style={styles.sectionTitle}>Información personal</Text>
         <View style={styles.infoCard}>
           <View style={styles.infoItem}>
@@ -76,6 +79,7 @@ export default function Perfil() {
               <Image source={editarIcon} style={styles.editIcon} />
             </TouchableOpacity>
           </View>
+
           <View style={styles.infoItem}>
             <Image source={correoIcon} style={styles.infoIcon} />
             {editingEmail ? (
@@ -93,6 +97,7 @@ export default function Perfil() {
           </View>
         </View>
 
+        {/* Mis mascotas */}
         <Text style={styles.sectionTitle}>Mis mascotas</Text>
         <View style={styles.petsCard}>
           {pets.map((p, i) => (
@@ -101,10 +106,23 @@ export default function Perfil() {
               <Text style={styles.petName}>{p}</Text>
             </View>
           ))}
-          <TouchableOpacity style={styles.addPetButton}>
+
+          {/* Navegar a Añadir mascota */}
+          <TouchableOpacity
+            style={styles.addPetButton}
+            onPress={() => router.push(Routes.AddMascota)}
+          >
             <Text style={styles.addPetText}>+ Añadir mascota</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Cerrar sesión */}
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={() => router.replace(Routes.Login)}
+        >
+          <Text style={styles.logoutText}>Cerrar sesión</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       {/* Barra de pestañas inferior */}

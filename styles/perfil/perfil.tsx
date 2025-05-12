@@ -1,7 +1,7 @@
 import { StyleSheet, Platform, Dimensions } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
-const TAB_BAR_HEIGHT = 60;
+export const TAB_BAR_HEIGHT = 60;
 
 export default StyleSheet.create({
   container: {
@@ -45,8 +45,8 @@ export default StyleSheet.create({
 
   sectionTitle: {
     fontSize: 18,
-    fontFamily: 'Poppins-SemiBold',
-    color: '#101419',
+    fontFamily: 'Poppins-Medium',
+    color: '#A15E49',
     marginHorizontal: 16,
     marginBottom: 8,
   },
@@ -71,13 +71,13 @@ export default StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 14,
-    fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Medium',
     color: '#101419',
   },
   infoInput: {
     flex: 1,
     fontSize: 14,
-    fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Medium',
     color: '#101419',
     borderBottomWidth: 1,
     borderColor: '#DDD',
@@ -108,7 +108,7 @@ export default StyleSheet.create({
   },
   petName: {
     fontSize: 14,
-    fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Medium',
     color: '#101419',
   },
   addPetButton: {
@@ -121,8 +121,23 @@ export default StyleSheet.create({
   },
   addPetText: {
     fontSize: 16,
-    fontFamily: 'Poppins-Bold',
-    color: '#FFFFFF',
+    fontFamily: 'Poppins-Medium',
+    color: '#000000',
+  },
+
+  logoutButton: {
+    height: 48,
+    backgroundColor: '#FF3B30',
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 16,
+    marginBottom: 24,
+  },
+  logoutText: {
+    fontSize: 16,
+    fontFamily: 'Poppins-Medium',
+    color: '#000000',
   },
 
   tabBar: {
@@ -149,7 +164,7 @@ export default StyleSheet.create({
   tabLabel: {
     marginTop: 4,
     fontSize: 10,
-    fontFamily: 'Poppins-Regular',
-    color: '#101419',
+    fontFamily: 'Poppins-Medium',
+    color: '#A15E49',
   },
 });

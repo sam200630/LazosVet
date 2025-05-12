@@ -3,7 +3,7 @@ import { StyleSheet, Platform, Dimensions } from 'react-native';
 const { width, height } = Dimensions.get('window');
 const PAW_SIZE   = width * 0.7;
 const PAW_OFFSET = PAW_SIZE * 0.5;
-const TAB_BAR_HEIGHT = 60;  // altura fija de la barra
+const TAB_BAR_HEIGHT = 60;
 
 export default StyleSheet.create({
   container: {
@@ -41,10 +41,10 @@ export default StyleSheet.create({
   },
 
   form: {
-    flex: 1,
+    flexGrow: 1,
     marginTop: 24,
     paddingHorizontal: 16,
-    paddingBottom: TAB_BAR_HEIGHT + 24, // deja espacio para la barra
+    paddingBottom: TAB_BAR_HEIGHT + 24,
   },
 
   label: {
@@ -54,22 +54,7 @@ export default StyleSheet.create({
     marginBottom: 4,
   },
 
-  pickerContainer: {
-    height: 44,
-    borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 12,
-    justifyContent: 'center',
-    paddingHorizontal: 12,
-    backgroundColor: '#FFF',
-    marginBottom: 16,
-  },
-  picker: {
-    width: '100%',
-    height: '100%',
-    color: '#101419',
-  },
-
+  // inputs estándar
   input: {
     height: 44,
     borderWidth: 1,
@@ -84,8 +69,10 @@ export default StyleSheet.create({
   extraInput: {
     height: 80,
     textAlignVertical: 'top',
+    borderRadius: 12,
   },
 
+  // Row para Fecha y Hora
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -94,6 +81,54 @@ export default StyleSheet.create({
     width: '48%',
   },
 
+  // Selector custom
+  selectorWrapper: {
+    marginBottom: 16,
+  },
+  selectorContainer: {
+    height: 44,
+    borderWidth: 1,
+    borderColor: '#DDD',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    backgroundColor: '#FFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  selectorText: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: '#101419',
+  },
+  selectorPlaceholder: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: '#999',
+  },
+  expanderIcon: {
+    width: 16,
+    height: 16,
+    tintColor: '#101419',
+  },
+  dropdown: {
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#DDD',
+    borderRadius: 8,
+    marginTop: 4,
+  },
+  option: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  optionText: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: '#101419',
+  },
+
+  // Botón
   button: {
     height: 48,
     backgroundColor: '#30C5FF',
@@ -111,7 +146,7 @@ export default StyleSheet.create({
     color: '#000000',
   },
 
-  // Barra inferior fija
+  // Barra de pestañas inferior
   tabBar: {
     position: 'absolute',
     left: 0,
