@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -22,62 +22,43 @@ import mediaIcon    from '../../assets/images/media.png';
 import perfilIcon   from '../../assets/images/perfil.png';
 import expanderIcon from '../../assets/images/expander.png';
 
+// Calendario
+import { Calendar } from 'react-native-calendars';
+
 export default function AddAppointment() {
   const router = useRouter();
-  const [pet, setPet] = useState('');
+  const [pet, setPet]       = useState('');
   const [reason, setReason] = useState('');
-  const [extra, setExtra] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [extra, setExtra]   = useState('');
+  const [date, setDate]     = useState('');
+  const [time, setTime]     = useState('');
 
-  const [showPetDropdown, setShowPetDropdown] = useState(false);
+  const [showPetDropdown, setShowPetDropdown]       = useState(false);
   const [showReasonDropdown, setShowReasonDropdown] = useState(false);
-  const petOptions = ['Titán', 'Milu', 'Bela'];
+  const [showDateCalendar, setShowDateCalendar]     = useState(false);
+  const [showTimeDropdown, setShowTimeDropdown]     = useState(false);
+
+  const petOptions    = ['Titán', 'Milu', 'Bela'];
   const reasonOptions = ['Baño', 'Consulta', 'Control'];
 
-  // get today's date at midnight
-  const today = new Date();
-  today.setHours(0,0,0,0);
-
-  // AUTO-FORMAT y bloqueo de fechas anteriores
-  const handleDateChange = (text: string) => {
-    const digits = text.replace(/\D/g, '').slice(0, 8);
-    let result = '';
-    if (digits.length > 0) result += digits.slice(0, 4);
-    if (digits.length >= 5) result += '-' + digits.slice(4, 6);
-    if (digits.length >= 7) result += '-' + digits.slice(6, 8);
-    // si ya tiene formato completo, validar no anterior a hoy
-    if (result.length === 10) {
-      const [y, m, d] = result.split('-').map(n => parseInt(n,10));
-      const picked = new Date(y, m - 1, d);
-      if (picked < today) {
-        return; // no actualizar
-      }
+  // Generar horas cada 30min
+  const timeOptions = useMemo(() => {
+    const arr: string[] = [];
+    for (let h = 8; h <= 17; h++) {
+      ['00', '30'].forEach(m => {
+        if (h === 17 && m === '30') {
+          arr.push('17:30');
+        } else if (h < 17) {
+          arr.push(`${String(h).padStart(2, '0')}:${m}`);
+        }
+      });
     }
-    setDate(result);
-  };
-  const isDateValid = /^\d{4}-\d{2}-\d{2}$/.test(date) && (() => {
-    const [y, m, d] = date.split('-').map(n => parseInt(n,10));
-    if (m < 1 || m > 12) return false;
-    const md = new Date(y, m, 0).getDate();
-    return d >= 1 && d <= md;
-  })();
+    return arr;
+  }, []);
 
-  // AUTO-FORMAT y validación de hora 08:00–17:30
-  const handleTimeChange = (text: string) => {
-    const digits = text.replace(/\D/g, '').slice(0, 4);
-    let result = digits;
-    if (digits.length >= 3) result = digits.slice(0, 2) + ':' + digits.slice(2);
-    setTime(result);
-  };
-  const isTimeValid = /^[0-2]\d:[0-5]\d$/.test(time) && (() => {
-    const [h, m] = time.split(':').map(n => parseInt(n,10));
-    if (h < 8 || h > 17) return false;
-    if (h === 17 && m > 30) return false;
-    return true;
-  })();
-
-  const isValid = !!(pet && reason && isDateValid && isTimeValid);
+  const isDateValid = Boolean(date);
+  const isTimeValid = timeOptions.includes(time);
+  const isValid     = Boolean(pet && reason && isDateValid && isTimeValid);
 
   const tabs = [
     { icon: homeIcon,   label: 'Home',    route: Routes.Home   },
@@ -85,6 +66,13 @@ export default function AddAppointment() {
     { icon: mediaIcon,  label: 'Media',   route: Routes.Home   },
     { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil },
   ];
+
+  // Fecha mínima = hoy
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm   = String(today.getMonth()+1).padStart(2,'0');
+  const dd   = String(today.getDate()).padStart(2,'0');
+  const minDate = `${yyyy}-${mm}-${dd}`;
 
   return (
     <KeyboardAvoidingView
@@ -164,42 +152,68 @@ export default function AddAppointment() {
           placeholderTextColor="#999"
           multiline
           numberOfLines={3}
-          value={extra}
           onChangeText={setExtra}
+          value={extra}
         />
 
-        {/* Fecha & Hora */}
-        <View style={styles.row}>
-          <View style={styles.half}>
-            <Text style={styles.label}>Fecha (YYYY-MM-DD)</Text>
-            <TextInput
-              style={[
-                styles.input,
-                date.length === 10 && !isDateValid ? { borderColor: 'red' } : {},
-              ]}
-              placeholder="2025-05-30"
-              placeholderTextColor="#999"
-              keyboardType="numeric"
-              value={date}
-              onChangeText={handleDateChange}
+        {/* Fecha como calendario */}
+        <Text style={styles.label}>Fecha</Text>
+        <View style={styles.calendarWrapper}>
+          <TouchableOpacity
+            style={styles.selectorContainer}
+            onPress={() => setShowDateCalendar(v => !v)}
+          >
+            <Text style={date ? styles.selectorText : styles.selectorPlaceholder}>
+              {date || 'Selecciona fecha'}
+            </Text>
+            <Image source={expanderIcon} style={styles.expanderIcon} />
+          </TouchableOpacity>
+          {showDateCalendar && (
+            <Calendar
+              onDayPress={day => {
+                setDate(day.dateString);
+                setShowDateCalendar(false);
+              }}
+              minDate={minDate}
+              markedDates={date ? { [date]: { selected: true } } : {}}
+              theme={{
+                arrowColor: '#A15E49',
+                todayTextColor: '#30C5FF',
+                selectedDayBackgroundColor: '#30C5FF',
+              }}
+              style={styles.calendar}
             />
-          </View>
-          <View style={styles.half}>
-            <Text style={styles.label}>Hora</Text>
-            <TextInput
-              style={[
-                styles.input,
-                time.length === 5 && !isTimeValid ? { borderColor: 'red' } : {},
-              ]}
-              placeholder="Horario de 8:00am-5:30pm"
-              placeholderTextColor="#999"
-              keyboardType="numeric"
-              value={time}
-              onChangeText={handleTimeChange}
-            />
-          </View>
+          )}
         </View>
 
+        {/* Hora */}
+        <Text style={styles.label}>Horario de 8:00am-5:30pm</Text>
+        <View style={styles.selectorWrapper}>
+          <TouchableOpacity
+            style={styles.selectorContainer}
+            onPress={() => setShowTimeDropdown(v => !v)}
+          >
+            <Text style={time ? styles.selectorText : styles.selectorPlaceholder}>
+              {time || 'Selecciona hora'}
+            </Text>
+            <Image source={expanderIcon} style={styles.expanderIcon} />
+          </TouchableOpacity>
+          {showTimeDropdown && (
+            <View style={styles.dropdown}>
+              {timeOptions.map(t => (
+                <TouchableOpacity
+                  key={t}
+                  style={styles.option}
+                  onPress={() => { setTime(t); setShowTimeDropdown(false); }}
+                >
+                  <Text style={styles.optionText}>{t}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Botón */}
         <TouchableOpacity
           style={[styles.button, !isValid && styles.buttonDisabled]}
           disabled={!isValid}

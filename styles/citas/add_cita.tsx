@@ -18,10 +18,7 @@ export default StyleSheet.create({
     left: 16,
     zIndex: 2,
   },
-  goBackIcon: {
-    width: 24,
-    height: 24,
-  },
+  goBackIcon: { width: 24, height: 24 },
 
   paw: {
     position: 'absolute',
@@ -54,7 +51,6 @@ export default StyleSheet.create({
     marginBottom: 4,
   },
 
-  // inputs estándar
   input: {
     height: 44,
     borderWidth: 1,
@@ -72,7 +68,6 @@ export default StyleSheet.create({
     borderRadius: 12,
   },
 
-  // Row para Fecha y Hora
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -81,7 +76,7 @@ export default StyleSheet.create({
     width: '48%',
   },
 
-  // Selector custom
+  // Selector personalizado
   selectorWrapper: {
     marginBottom: 16,
   },
@@ -106,11 +101,7 @@ export default StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: '#999',
   },
-  expanderIcon: {
-    width: 16,
-    height: 16,
-    tintColor: '#101419',
-  },
+  expanderIcon: { width: 16, height: 16, tintColor: '#101419' },
   dropdown: {
     backgroundColor: '#FFF',
     borderWidth: 1,
@@ -128,6 +119,16 @@ export default StyleSheet.create({
     color: '#101419',
   },
 
+  // Calendar wrapper
+  calendarWrapper: {
+    marginBottom: 16,
+  },
+  calendar: {
+    width: '100%',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+
   // Botón
   button: {
     height: 48,
@@ -143,10 +144,9 @@ export default StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontFamily: 'Poppins-Bold',
-    color: '#000000',
+    color: '#000',
   },
 
-  // Barra de pestañas inferior
   tabBar: {
     position: 'absolute',
     left: 0,
@@ -160,14 +160,8 @@ export default StyleSheet.create({
     borderColor: '#EEE',
     backgroundColor: '#FFF',
   },
-  tabItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  tabIcon: {
-    width: 24,
-    height: 24,
-  },
+  tabItem: { flex: 1, alignItems: 'center' },
+  tabIcon: { width: 24, height: 24 },
   tabLabel: {
     marginTop: 4,
     fontSize: 10,
