@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,16 @@ import {
   KeyboardAvoidingView,
   Platform,
   useWindowDimensions,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Routes } from '../route';
+import { AuthContext } from '../Context/AuthContext';
 import styles from '../styles/register';
 
 export default function Register() {
   const router = useRouter();
+  const { register } = useContext(AuthContext);
+
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -23,9 +26,12 @@ export default function Register() {
   const isWeb = Platform.OS === 'web';
   const formWidth = isWeb ? Math.min(400, width * 0.8) : width * 0.9;
 
-  const handleRegister = () => {
-    console.log('Nombre:', name, 'Teléfono:', phone, 'Correo:', email);
-    router.replace(Routes.Login);   // /login
+  const handleRegister = async () => {
+    try {
+      await register(name, phone, email, password);
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo registrar. Verifica los datos.');
+    }
   };
 
   return (
@@ -98,7 +104,7 @@ export default function Register() {
           Ya tienes cuenta?{' '}
           <Text
             style={styles.registerLink}
-            onPress={() => router.push(Routes.Login)} // /login
+            onPress={() => router.push('/login')}
           >
             Inicia sesión
           </Text>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -8,22 +8,27 @@ import {
   KeyboardAvoidingView,
   Platform,
   useWindowDimensions,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Routes } from '../route';
+import { AuthContext } from '../Context/AuthContext';
 import styles from '../styles/login';
 
 export default function Login() {
   const router = useRouter();
+  const { login } = useContext(AuthContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
   const formWidth = isWeb ? Math.min(400, width * 0.8) : width * 0.9;
 
-  const handleLogin = () => {
-    console.log('Usuario:', username, 'Password:', password);
-    router.replace(Routes.Home);    // /home/home
+  const handleLogin = async () => {
+    try {
+      await login(username, password);
+    } catch (error) {
+      Alert.alert('Error', 'Correo o contraseña inválidos.');
+    }
   };
 
   return (
@@ -76,7 +81,7 @@ export default function Login() {
           No tienes cuenta?{' '}
           <Text
             style={styles.registerLink}
-            onPress={() => router.push(Routes.Register)} // /register
+            onPress={() => router.push('/register')}
           >
             ¡Regístrate!
           </Text>

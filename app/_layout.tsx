@@ -3,6 +3,7 @@ import React from 'react';
 import { View, ActivityIndicator, StyleSheet, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
+import { AuthProvider } from '../Context/AuthContext';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -34,7 +35,12 @@ export default function RootLayout() {
     );
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <AuthProvider>
+        <Stack screenOptions={{ headerShown: false }} />;
+    </AuthProvider>
+    );
+  
 }
 
 const styles = StyleSheet.create({
