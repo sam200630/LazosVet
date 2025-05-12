@@ -14,6 +14,8 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'expo-router';
+import { Routes } from '../route';
+
 
 export const AuthContext = createContext<any>(null);
 
@@ -31,7 +33,7 @@ export const AuthProvider = ({ children }: any) => {
         const role = isAdmin ? 'admin' : 'usuario';
         setUserType(role);
 
-        router.replace(isAdmin ? '/admin' : '/home');
+        router.replace(isAdmin ? Routes.Admin : Routes.Home);
       } else {
         setUserType('');
         router.replace('/login');

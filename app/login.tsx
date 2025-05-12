@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import { AuthContext } from '../Context/AuthContext';
 import styles from '../styles/login';
+import { Routes } from '../route';
 
 export default function Login() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function Login() {
     } catch (error) {
       Alert.alert('Error', 'Correo o contraseña inválidos.');
     }
+    router.replace(Routes.Home); 
   };
 
   return (

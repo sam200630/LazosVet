@@ -6,4 +6,5 @@ export const Routes = {
   Register: '/register',
   Home: '/home/home',
   AddAppointment: '/citas/add_cita',
+  Admin: '/admin/admin',
 };
