@@ -77,7 +77,7 @@ export default function AddAppointment() {
     { icon: homeIcon,   label: 'Home',    route: Routes.Home },
     { icon: petbotIcon, label: 'Pet bot', route: Routes.Home },
     { icon: mediaIcon,  label: 'Media',   route: Routes.Home },
-    { icon: perfilIcon, label: 'Perfil',  route: Routes.Home },
+    { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil },
   ];
 
   return (
