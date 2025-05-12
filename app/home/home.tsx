@@ -25,15 +25,13 @@ const dummyPets = [
 export default function Home() {
   const router = useRouter();
   const { width } = useWindowDimensions();
-
-  // Estado para índice del carrusel
   const [bannerIndex, setBannerIndex] = useState(0);
+
   const prevBanner = () =>
     setBannerIndex((bannerIndex - 1 + bannerColors.length) % bannerColors.length);
   const nextBanner = () =>
     setBannerIndex((bannerIndex + 1) % bannerColors.length);
 
-  // Configuración de pestañas inferiores
   const tabs = [
     { icon: require('../../assets/images/home.png'),    label: 'Home',    route: Routes.Home },
     { icon: require('../../assets/images/petbot.png'),  label: 'Pet bot', route: Routes.Home },
@@ -103,7 +101,10 @@ export default function Home() {
           </View>
           <Text style={styles.cardDate}>30 de mayo, 2 pm</Text>
           <View style={styles.cardButtons}>
-            <TouchableOpacity style={styles.cardButton}>
+            <TouchableOpacity
+              style={styles.cardButton}
+              onPress={() => router.push(Routes.AddAppointment)}  // <-- aquí
+            >
               <Text style={styles.cardButtonText}>+ Añadir cita</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.cardButton}>

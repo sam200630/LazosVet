@@ -27,6 +27,7 @@ export default StyleSheet.create({
   icon: {
     width: 24,
     height: 24,
+    borderColor: 'FFFFFF'
   },
 
   // Carrusel manual
@@ -54,7 +55,7 @@ export default StyleSheet.create({
 
   sectionTitle: {
     fontSize: 18,
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: 'Poppins-Medium',
     color: '#101419',
     marginHorizontal: 16,
     marginTop: 24,
@@ -80,7 +81,7 @@ export default StyleSheet.create({
 
   petName: {
     fontSize: 12,
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: 'Poppins-Regular',
     color: '#101419',
   },
 
@@ -112,13 +113,13 @@ export default StyleSheet.create({
 
   cardTitle: {
     fontSize: 16,
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: 'Poppins-Regular',
     color: '#101419',
   },
 
   cardDate: {
-    fontSize: 14,
-    fontFamily: 'Poppins-Regular',
+    fontSize: 10,
+    fontFamily: 'Poppins-Light',
     color: '#101419',
     marginBottom: 12,
   },
@@ -139,8 +140,8 @@ export default StyleSheet.create({
 
   cardButtonText: {
     fontSize: 12,
-    fontFamily: 'Poppins-Bold',
-    color: '#FFFFFF',
+    fontFamily: 'Poppins-Regular',
+    color: '#000000',
   },
 
   tabBar: {
@@ -167,6 +168,6 @@ export default StyleSheet.create({
     marginTop: 4,
     fontSize: 10,
     fontFamily: 'Poppins-Regular',
-    color: '#101419',
+    color: '#A15E49',
   },
 });
