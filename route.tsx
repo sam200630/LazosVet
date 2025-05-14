@@ -5,4 +5,5 @@ export const Routes = {
   AddAppointment: '/citas/add_cita',
   Perfil: '/perfil/perfil',
   AddMascota: '/perfil/add_mascota',
+  Media: '/media/principal',
 };
