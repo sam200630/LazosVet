@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -8,10 +8,12 @@ import {
   Image,
   TouchableOpacity,
   Platform,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import styles, { TAB_BAR_HEIGHT } from '../../styles/perfil/perfil';
 import { Routes } from '../../route';
+import { AuthContext } from '../../Context/AuthContext';
 
 // imágenes estáticas
 import goBackIcon   from '../../assets/images/goBack.png';
@@ -26,6 +28,7 @@ import perfilIcon   from '../../assets/images/perfil.png';
 
 export default function Perfil() {
   const router = useRouter();
+   const { logout } = useContext(AuthContext);
 
   const [editingName, setEditingName]   = useState(false);
   const [editingEmail, setEditingEmail] = useState(false);
@@ -39,6 +42,15 @@ export default function Perfil() {
     { icon: mediaIcon,  label: 'Media',   route: Routes.Home   },
     { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil },
   ];
+
+  const handleLogout = async () => {
+      try {
+        await logout();
+      } catch (error) {
+        Alert.alert('Error', 'Correo o contraseña inválidos.');
+      }
+      router.replace(Routes.Login); 
+    };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -119,7 +131,7 @@ export default function Perfil() {
         {/* Cerrar sesión */}
         <TouchableOpacity
           style={styles.logoutButton}
-          onPress={() => router.replace(Routes.Login)}
+          onPress={() => handleLogout()}
         >
           <Text style={styles.logoutText}>Cerrar sesión</Text>
         </TouchableOpacity>

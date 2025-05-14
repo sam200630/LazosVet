@@ -11,7 +11,8 @@ import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   User as FirebaseUser,
-} from 'firebase/auth';
+} 
+from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'expo-router';
 import { Routes } from '../route';
@@ -25,7 +26,7 @@ export const AuthProvider = ({ children }: any) => {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (usr) => {
+    const unsubscribe = onAuthStateChanged(auth, (usr: FirebaseUser | null) => {
       setUser(usr);
 
       if (usr?.email) {

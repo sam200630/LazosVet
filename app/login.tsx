@@ -30,7 +30,7 @@ export default function Login() {
     } catch (error) {
       Alert.alert('Error', 'Correo o contraseña inválidos.');
     }
-    router.replace(Routes.Home); 
+    
   };
 
   return (
