@@ -35,8 +35,8 @@ export default function Home() {
   const tabs = [
     { icon: require('../../assets/images/home.png'),    label: 'Home',    route: Routes.Home },
     { icon: require('../../assets/images/petbot.png'),  label: 'Pet bot', route: Routes.Home },
-    { icon: require('../../assets/images/media.png'),   label: 'Media',   route: Routes.Home },
-    { icon: require('../../assets/images/perfil.png'),  label: 'Perfil',  route: Routes.Home },
+    { icon: require('../../assets/images/media.png'),   label: 'Media',   route: Routes.Media },
+    { icon: require('../../assets/images/perfil.png'),  label: 'Perfil',  route: Routes.Perfil },
   ];
 
   return (
