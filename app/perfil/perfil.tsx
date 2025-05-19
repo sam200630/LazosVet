@@ -162,7 +162,7 @@ export default function Perfil() {
         </View>
 
         {/* + Añadir mascota (próximamente) */}
-        <TouchableOpacity style={styles.addPetButton}>
+        <TouchableOpacity style={styles.addPetButton} onPress={() => router.replace(Routes.AddMascota)}>
           <Text style={styles.addPetText}>+ Añadir mascota</Text>
         </TouchableOpacity>
 
