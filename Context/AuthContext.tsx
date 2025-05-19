@@ -33,11 +33,11 @@ export const AuthProvider = ({ children }: any) => {
         const isAdmin = usr.email.includes('@admin');
         const role = isAdmin ? 'admin' : 'usuario';
         setUserType(role);
-
-        router.replace(isAdmin ? Routes.Admin : Routes.Home);
+        router.replace(Routes.Home);
+      
       } else {
         setUserType('');
-        router.replace('/login');
+        router.replace(Routes.Login);
       }
     });
 
@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }: any) => {
     await auth.signOut();
     setUser(null);
     setUserType('');
-    router.push('/login');
+    router.push(Routes.Login);
   };
 
   return (

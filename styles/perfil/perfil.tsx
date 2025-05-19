@@ -1,7 +1,8 @@
+// styles/perfil/perfilLocalStyles.ts
 import { StyleSheet, Platform, Dimensions } from 'react-native';
+import { TAB_BAR_HEIGHT } from './add_mascota';
 
-const { width, height } = Dimensions.get('window');
-export const TAB_BAR_HEIGHT = 60;
+const { height } = Dimensions.get('window');
 
 export default StyleSheet.create({
   container: {
@@ -21,12 +22,29 @@ export default StyleSheet.create({
     height: 24,
   },
 
+  // Header row for title and edit button
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: 16,
+    marginTop: height * 0.08,
+  },
   title: {
     fontSize: 20,
     fontFamily: 'Poppins-Medium',
     color: '#A15E49',
-    textAlign: 'center',
-    marginTop: height * 0.08,
+  },
+  editPhotoButton: {
+    backgroundColor: '#30C5FF',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 24,
+  },
+  editPhotoText: {
+    color: '#FFFFFF',
+    fontFamily: 'Poppins-Medium',
+    fontSize: 14,
   },
 
   profilePicContainer: {
@@ -74,27 +92,13 @@ export default StyleSheet.create({
     fontFamily: 'Poppins-Medium',
     color: '#101419',
   },
-  infoInput: {
-    flex: 1,
-    fontSize: 14,
-    fontFamily: 'Poppins-Medium',
-    color: '#101419',
-    borderBottomWidth: 1,
-    borderColor: '#DDD',
-    paddingVertical: 2,
-  },
-  editIcon: {
-    width: 16,
-    height: 16,
-    marginLeft: 8,
-  },
 
   petsCard: {
     backgroundColor: '#F2E8E2',
     marginHorizontal: 16,
     borderRadius: 12,
     padding: 16,
-    marginBottom: 24,
+    marginBottom: 16,
   },
   petRow: {
     flexDirection: 'row',
@@ -117,7 +121,8 @@ export default StyleSheet.create({
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
+    marginHorizontal: 16,
+    marginBottom: 24,
   },
   addPetText: {
     fontSize: 16,

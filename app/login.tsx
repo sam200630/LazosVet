@@ -11,7 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { AuthContext } from '../Context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import styles from '../styles/login';
 import { Routes } from '../route';
 
@@ -83,7 +83,7 @@ export default function Login() {
           No tienes cuenta?{' '}
           <Text
             style={styles.registerLink}
-            onPress={() => router.push('/register')}
+            onPress={() => router.push(Routes.Register)}
           >
             ¡Regístrate!
           </Text>
