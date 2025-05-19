@@ -2,7 +2,14 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { db } from '../utils/FirebaseConfig';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  onSnapshot,
+  collection,
+  query,
+  where,
+} from 'firebase/firestore';
 import { AuthContext } from './AuthContext';
 
 export interface ProfileContextType {
@@ -31,6 +38,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // 1) Carga inicial de nombre, correo y foto
   const fetchProfile = async () => {
     if (!user) {
       setLoading(false);
@@ -38,18 +46,13 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
     setLoading(true);
 
-    // Traer datos de usuario
     const userSnap = await getDoc(doc(db, 'users', user.uid));
     if (userSnap.exists()) {
       const data = userSnap.data();
       setName(data.name);
       setEmail(data.email);
-      setPhotoUrl(data.photoUrl || null); 
+      setPhotoUrl(data.photoUrl || null);
     }
-
-    // Traer mascotas
-    const petSnap = await getDocs(collection(db, 'users', user.uid, 'pets'));
-    setPets(petSnap.docs.map(d => d.data().name as string));
 
     setLoading(false);
   };
@@ -58,8 +61,34 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     fetchProfile();
   }, [user]);
 
+  // 2) Suscripción en tiempo real a la colección "pets" filrada por userId
+  useEffect(() => {
+    if (!user) {
+      setPets([]);
+      return;
+    }
+    const q = query(
+      collection(db, 'pets'),
+      where('userId', '==', user.uid)
+    );
+    const unsubscribe = onSnapshot(q, snapshot => {
+      const names = snapshot.docs.map(d => d.data().name as string);
+      setPets(names);
+    });
+    return () => unsubscribe();
+  }, [user]);
+
   return (
-    <ProfileContext.Provider value={{ name, email, pets, photoUrl, loading, refreshProfile: fetchProfile }}>
+    <ProfileContext.Provider
+      value={{
+        name,
+        email,
+        pets,
+        photoUrl,
+        loading,
+        refreshProfile: fetchProfile,
+      }}
+    >
       {children}
     </ProfileContext.Provider>
   );

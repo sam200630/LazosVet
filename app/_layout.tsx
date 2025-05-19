@@ -5,6 +5,8 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { AuthProvider } from '../context/AuthContext';
 import { ProfileProvider } from '../context/ProfileContext';
+import { PetsProvider } from '../context/PetsContext';
+import { DatesProvider } from '../context/DatesContext';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -38,10 +40,13 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-       <ProfileProvider>
-        <Stack screenOptions={{ headerShown: false }} />
-       </ProfileProvider>
-        
+      <ProfileProvider>
+          <PetsProvider>
+            <DatesProvider>
+              <Stack screenOptions={{ headerShown: false }} />
+            </DatesProvider>
+          </PetsProvider>  
+      </ProfileProvider>
     </AuthProvider>
     );
   

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -9,52 +9,80 @@ import {
   TouchableOpacity,
   NativeSyntheticEvent,
   TextInputChangeEventData,
-  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import styles, { TAB_BAR_HEIGHT } from '../../styles/perfil/add_mascota';
 import { Routes } from '../../route';
+import { CameraModal } from '../../components/CameraModal';
+import { PetsContext } from '../../context/PetsContext';
 
-// imágenes estáticas
-import goBackIcon   from '../../assets/images/goBack.png';
-import homeIcon     from '../../assets/images/home.png';
-import petbotIcon   from '../../assets/images/petbot.png';
-import mediaIcon    from '../../assets/images/media.png';
-import perfilIcon   from '../../assets/images/perfil.png';
+// íconos...
+import goBackIcon from '../../assets/images/goBack.png';
+import homeIcon from '../../assets/images/home.png';
+import petbotIcon from '../../assets/images/petbot.png';
+import mediaIcon from '../../assets/images/media.png';
+import perfilIcon from '../../assets/images/perfil.png';
 import expanderIcon from '../../assets/images/expander.png';
 
 export default function AddMascota() {
   const router = useRouter();
+  const { addPet } = useContext(PetsContext);
 
-  // estados de formulario
-  const [name, setName]       = useState('');
-  const [breed, setBreed]     = useState('');
-  const [gender, setGender]   = useState('');
+  // Form state
+  const [name, setName] = useState('');
+  const [breed, setBreed] = useState('');
+  const [gender, setGender] = useState('');
   const [showGenderDropdown, setShowGenderDropdown] = useState(false);
-  const [age, setAge]         = useState('');
-  const [ageUnit, setAgeUnit] = useState<'Años'|'Meses'>('Años');
+  const [age, setAge] = useState('');
+  const [ageUnit, setAgeUnit] = useState<'Años' | 'Meses'>('Años');
   const [showUnits, setShowUnits] = useState(false);
-  const [weight, setWeight]   = useState('');
-  const [conds, setConds]     = useState('');
+  const [weight, setWeight] = useState('');
+  const [conds, setConds] = useState('');
 
-  const genderOptions = ['Macho','Hembra'];
+  // Photo
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const handleAgeChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) =>
-    setAge(e.nativeEvent.text.replace(/\D/g, '').slice(0,3));
-  const handleWeightChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) =>
-    setWeight(e.nativeEvent.text.replace(/\D/g, '').slice(0,5));
-
+  const genderOptions = ['Macho', 'Hembra'];
   const isValid = !!(name && breed && gender && age && weight);
 
+  const handleAgeChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) =>
+    setAge(e.nativeEvent.text.replace(/\D/g, '').slice(0, 3));
+  const handleWeightChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) =>
+    setWeight(e.nativeEvent.text.replace(/\D/g, '').slice(0, 5));
+
+  const handleSubmit = async () => {
+    await addPet({
+      name,
+      breed,
+      gender,
+      age: parseInt(age, 10),
+      ageUnit,
+      weight: parseFloat(weight),
+      conditions: conds,
+      photoLocalUri: photoUri || undefined,
+    });
+    router.replace(Routes.Home);
+  };
+
   const tabs = [
-    { icon: homeIcon,   label: 'Home',    route: Routes.Home   },
-    { icon: petbotIcon, label: 'Pet bot', route: Routes.Home   },
-    { icon: mediaIcon,  label: 'Media',   route: Routes.Media  },
-    { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil },
+    { icon: homeIcon, label: 'Home', route: Routes.Home },
+    { icon: petbotIcon, label: 'Pet bot', route: Routes.Home },
+    { icon: mediaIcon, label: 'Media', route: Routes.Media },
+    { icon: perfilIcon, label: 'Perfil', route: Routes.Perfil },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
+      <CameraModal
+        isVisible={modalVisible}
+        setImage={(asset) => {
+          setPhotoUri(asset.uri);
+          setModalVisible(false);
+        }}
+        closeModal={() => setModalVisible(false)}
+      />
+
       <TouchableOpacity
         style={styles.goBack}
         onPress={() => router.replace(Routes.Perfil)}
@@ -65,14 +93,24 @@ export default function AddMascota() {
       <ScrollView contentContainerStyle={{ paddingBottom: TAB_BAR_HEIGHT + 24 }}>
         <Text style={styles.title}>Añadir mascota</Text>
 
+        {/* Foto mascota */}
         <View style={styles.profilePicContainer}>
-          <View style={styles.profilePic} />
-          <TouchableOpacity style={styles.addPhotoButton}>
+          {photoUri ? (
+            <Image source={{ uri: photoUri }} style={styles.profilePic} />
+          ) : (
+            <View style={styles.profilePic} />
+          )}
+          <TouchableOpacity
+            style={styles.addPhotoButton}
+            onPress={() => setModalVisible(true)}
+          >
             <Text style={styles.addPhotoText}>+ Foto</Text>
           </TouchableOpacity>
         </View>
 
+        {/* Formulario */}
         <View style={styles.form}>
+          {/* Nombre */}
           <Text style={styles.label}>Nombre</Text>
           <TextInput
             style={styles.input}
@@ -82,6 +120,7 @@ export default function AddMascota() {
             onChangeText={setName}
           />
 
+          {/* Raza */}
           <Text style={styles.label}>Raza</Text>
           <TextInput
             style={styles.input}
@@ -91,6 +130,7 @@ export default function AddMascota() {
             onChangeText={setBreed}
           />
 
+          {/* Género */}
           <Text style={styles.label}>Género</Text>
           <View style={styles.selectorWrapper}>
             <TouchableOpacity
@@ -120,6 +160,7 @@ export default function AddMascota() {
             )}
           </View>
 
+          {/* Edad */}
           <Text style={styles.label}>Edad</Text>
           <View style={styles.ageRow}>
             <TextInput
@@ -147,7 +188,7 @@ export default function AddMascota() {
                       key={u}
                       style={styles.unitOption}
                       onPress={() => {
-                        setAgeUnit(u as 'Años'|'Meses');
+                        setAgeUnit(u as 'Años' | 'Meses');
                         setShowUnits(false);
                       }}
                     >
@@ -159,6 +200,7 @@ export default function AddMascota() {
             </View>
           </View>
 
+          {/* Peso */}
           <Text style={styles.label}>Peso (kg)</Text>
           <TextInput
             style={styles.input}
@@ -169,6 +211,7 @@ export default function AddMascota() {
             onChange={handleWeightChange}
           />
 
+          {/* Condiciones */}
           <Text style={styles.label}>Condiciones de salud</Text>
           <TextInput
             style={[styles.input, styles.extraInput]}
@@ -183,13 +226,14 @@ export default function AddMascota() {
           <TouchableOpacity
             style={[styles.button, !isValid && styles.buttonDisabled]}
             disabled={!isValid}
-            onPress={() => {/* guardar mascota */}}
+            onPress={handleSubmit}
           >
             <Text style={styles.buttonText}>Añadir mascota +</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
 
+      {/* Tab bar */}
       <View style={styles.tabBar}>
         {tabs.map((tab, i) => (
           <TouchableOpacity

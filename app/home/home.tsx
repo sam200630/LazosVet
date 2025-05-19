@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   Text,
@@ -11,21 +11,17 @@ import {
 import { useRouter } from 'expo-router';
 import { Routes } from '../../route';
 import styles from '../../styles/home/home';
+import { PetsContext } from '../../context/PetsContext';
 
 // Colores de ejemplo para el carrusel
 const bannerColors = ['#FFC107', '#03A9F4', '#8BC34A'];
-
-// Datos de ejemplo para "Mis mascotas"
-const dummyPets = [
-  { id: '1', name: 'Titán', type: 'Perro', color: '#FFCDD2' },
-  { id: '2', name: 'Milu',  type: 'Gato',  color: '#C5CAE9' },
-  { id: '3', name: 'Bela',  type: 'Perro', color: '#B2DFDB' },
-];
 
 export default function Home() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const [bannerIndex, setBannerIndex] = useState(0);
+  const { pets, loading } = useContext(PetsContext);
+
 
   const prevBanner = () =>
     setBannerIndex((bannerIndex - 1 + bannerColors.length) % bannerColors.length);
@@ -78,16 +74,21 @@ export default function Home() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.petsList}
         >
-          {dummyPets.map(p => (
-            <View key={p.id} style={styles.petCard}>
-              <View
-                style={[styles.petPlaceholder, { backgroundColor: p.color }]}
-              />
-              <Text style={styles.petName}>{p.name}</Text>
-              <Text style={styles.petType}>{p.type}</Text>
-            </View>
-          ))}
-        </ScrollView>
+           {pets.map((p) => (
+              <View key={p.id} style={styles.petCard}>
+                <Image
+                  source={
+                    p.photoUrl
+                      ? { uri: p.photoUrl }
+                      : require('../../assets/images/default-profile.jpeg')
+                  }
+                  style={styles.petPlaceholder}
+                />
+                <Text style={styles.petName}>{p.name}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        
 
         {/* Próximas citas */}
         <Text style={styles.sectionTitle}>Próximas citas</Text>
