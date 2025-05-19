@@ -3,8 +3,8 @@ import { StyleSheet, Platform, Dimensions } from 'react-native';
 const { width, height } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
 
-const SMALL_FACTOR = isWeb ? 0.4 : 0.2;
-const LARGE_FACTOR = isWeb ? 0.2 : 0.05;
+const SMALL_FACTOR = isWeb ? 0.4 : 0.5;
+const LARGE_FACTOR = isWeb ? 0.4 : 0.7;
 const CROP_FACTOR = 0.3;
 
 const SMALL_SIZE = height * SMALL_FACTOR;
