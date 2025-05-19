@@ -1,4 +1,6 @@
-import React, { useState, useMemo } from 'react';
+// app/citas/add_cita.tsx
+
+import React, { useState, useMemo, useContext } from 'react';
 import {
   View,
   Text,
@@ -8,10 +10,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Routes } from '../../route';
 import styles from '../../styles/citas/add_cita';
+import { PetsContext } from '../../context/PetsContext';  // <-- import context
+import { DatesContext } from '../../context/DatesContext'; // <-- import context
 
 // Imports estáticos
 import goBackIcon   from '../../assets/images/goBack.png';
@@ -27,6 +32,11 @@ import { Calendar } from 'react-native-calendars';
 
 export default function AddAppointment() {
   const router = useRouter();
+
+  // Consume PetsContext
+  const { pets, loading: loadingPets } = useContext(PetsContext);
+  const { addDate } = useContext(DatesContext); 
+
   const [pet, setPet]       = useState('');
   const [reason, setReason] = useState('');
   const [extra, setExtra]   = useState('');
@@ -38,7 +48,7 @@ export default function AddAppointment() {
   const [showDateCalendar, setShowDateCalendar]     = useState(false);
   const [showTimeDropdown, setShowTimeDropdown]     = useState(false);
 
-  const petOptions    = ['Titán', 'Milu', 'Bela'];
+
   const reasonOptions = ['Baño', 'Consulta', 'Control'];
 
   // Generar horas cada 30min
@@ -74,6 +84,19 @@ export default function AddAppointment() {
   const dd   = String(today.getDate()).padStart(2,'0');
   const minDate = `${yyyy}-${mm}-${dd}`;
 
+  const handleDate = async () => {
+    const selected = pets.find(p => p.name === pet);
+    if (!selected) return;
+    await addDate({
+      petId: selected.id,
+      reason,
+      notes: extra,
+      date,
+      time,
+    });
+    router.replace(Routes.Home);
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -102,17 +125,22 @@ export default function AddAppointment() {
             </Text>
             <Image source={expanderIcon} style={styles.expanderIcon} />
           </TouchableOpacity>
+
           {showPetDropdown && (
             <View style={styles.dropdown}>
-              {petOptions.map(o => (
-                <TouchableOpacity
-                  key={o}
-                  style={styles.option}
-                  onPress={() => { setPet(o); setShowPetDropdown(false); }}
-                >
-                  <Text style={styles.optionText}>{o}</Text>
-                </TouchableOpacity>
-              ))}
+              {loadingPets ? (
+                <ActivityIndicator size="small" color="#30C5FF" style={{ margin: 16 }} />
+              ) : (
+                pets.map(p => (
+                  <TouchableOpacity
+                    key={p.id}
+                    style={styles.option}
+                    onPress={() => { setPet(p.name); setShowPetDropdown(false); }}
+                  >
+                    <Text style={styles.optionText}>{p.name}</Text>
+                  </TouchableOpacity>
+                ))
+              )}
             </View>
           )}
         </View>
@@ -217,7 +245,7 @@ export default function AddAppointment() {
         <TouchableOpacity
           style={[styles.button, !isValid && styles.buttonDisabled]}
           disabled={!isValid}
-          onPress={() => {/* Generar confirmación */}}
+          onPress={handleDate}
         >
           <Text style={styles.buttonText}>Generar confirmación</Text>
         </TouchableOpacity>
@@ -239,3 +267,7 @@ export default function AddAppointment() {
     </KeyboardAvoidingView>
   );
 }
+function addDate(arg0: { petId: string; reason: string; notes: string; date: string; time: string; }) {
+  throw new Error('Function not implemented.');
+}
+
