@@ -7,4 +7,5 @@ export const Routes = {
   AddMascota: 'perfil/add_mascota',
   Media: 'media/principal',
   Mascota: 'perfil/mascota',
+  Petbot: 'petBot/chat',
 };

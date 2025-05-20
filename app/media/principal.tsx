@@ -30,7 +30,7 @@ export default function MediaPrincipal() {
 
   const tabsBottom = [
     { icon: homeIcon,   route: Routes.Home,   label: 'Home'   },
-    { icon: petbotIcon, route: Routes.Home,   label: 'Pet bot'},
+    { icon: petbotIcon, route: Routes.Petbot,   label: 'Pet bot'},
     { icon: mediaIcon,  route: Routes.Media,  label: 'Media'  },
     { icon: perfilIcon, route: Routes.Perfil, label: 'Perfil' },
   ];
