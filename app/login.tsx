@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   useWindowDimensions,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AuthContext } from '../context/AuthContext';
@@ -18,19 +17,47 @@ import { Routes } from '../route';
 export default function Login() {
   const router = useRouter();
   const { login } = useContext(AuthContext);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+
+  const [username, setUsername]     = useState('');
+  const [password, setPassword]     = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
   const formWidth = isWeb ? Math.min(400, width * 0.8) : width * 0.9;
 
   const handleLogin = async () => {
-    try {
-      await login(username, password);
-    } catch (error) {
-      Alert.alert('Error', 'Correo o contraseña inválidos.');
+    // limpiar mensajes previos
+    setErrorMessage(null);
+
+    // 1) Validar campos completos
+    if (!username.trim() || !password) {
+      setErrorMessage('Por favor completa todos los campos.');
+      return;
     }
-    
+
+    // 2) Intentar login y capturar errores
+    try {
+      await login(username.trim(), password);
+      router.replace(Routes.Home);
+    } catch (error: any) {
+      let message = 'Correo o contraseña inválidos.';
+      switch (error.code) {
+        case 'auth/user-not-found':
+          message = 'Usuario no encontrado.';
+          break;
+        case 'auth/wrong-password':
+          message = 'Contraseña incorrecta.';
+          break;
+        case 'auth/invalid-email':
+          message = 'El formato del correo es inválido.';
+          break;
+        case 'auth/too-many-requests':
+          message = 'Demasiados intentos. Intenta más tarde.';
+          break;
+      }
+      setErrorMessage(message);
+    }
   };
 
   return (
@@ -56,13 +83,21 @@ export default function Login() {
       <Text style={styles.subtitle}>Iniciar sesión</Text>
 
       <View style={[styles.form, { width: formWidth }]}>
+        {/* Mensaje de error inline */}
+        {errorMessage && (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        )}
+
         <Text style={styles.label}>Usuario</Text>
         <TextInput
           style={styles.input}
           placeholder="Ingresa tu usuario"
           placeholderTextColor="#999"
           value={username}
-          onChangeText={setUsername}
+          onChangeText={text => {
+            setUsername(text);
+            if (errorMessage) setErrorMessage(null);
+          }}
         />
 
         <Text style={[styles.label, { marginTop: 16 }]}>Contraseña</Text>
@@ -72,7 +107,10 @@ export default function Login() {
           placeholderTextColor="#999"
           secureTextEntry
           value={password}
-          onChangeText={setPassword}
+          onChangeText={text => {
+            setPassword(text);
+            if (errorMessage) setErrorMessage(null);
+          }}
         />
 
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
@@ -80,7 +118,7 @@ export default function Login() {
         </TouchableOpacity>
 
         <Text style={styles.registerText}>
-          No tienes cuenta?{' '}
+          ¿No tienes cuenta?{' '}
           <Text
             style={styles.registerLink}
             onPress={() => router.push(Routes.Register)}

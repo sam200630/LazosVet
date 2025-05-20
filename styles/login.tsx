@@ -1,17 +1,17 @@
+// styles/login.ts
+
 import { StyleSheet, Platform, Dimensions } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
 
-// Proporciones para las huellas
 const SMALL_FACTOR = isWeb ? 0.4 : 0.5;
 const LARGE_FACTOR = isWeb ? 0.4 : 0.7;
-const CROP_FACTOR = 0.3;
+const CROP_FACTOR   = 0.3;
 
-const SMALL_SIZE = height * SMALL_FACTOR;
+const SMALL_SIZE   = height * SMALL_FACTOR;
 const SMALL_OFFSET = SMALL_SIZE * CROP_FACTOR;
-
-const LARGE_SIZE = width * LARGE_FACTOR;
+const LARGE_SIZE   = width * LARGE_FACTOR;
 const LARGE_OFFSET = LARGE_SIZE * CROP_FACTOR;
 
 export default StyleSheet.create({
@@ -20,10 +20,9 @@ export default StyleSheet.create({
     backgroundColor: '#FFFFFF',
     paddingTop: Platform.OS === 'android' ? 25 : 0,
     alignItems: 'center',
-    justifyContent: isWeb ? 'center' : 'flex-start',
+    justifyContent: 'center',   // <--- siempre centrar verticalmente
   },
 
-  // Huellas pequeñas
   huellasInicio: {
     position: 'absolute',
     width: SMALL_SIZE,
@@ -33,7 +32,6 @@ export default StyleSheet.create({
     opacity: 0.5,
   },
 
-  // Huella grande
   huellaGrande: {
     position: 'absolute',
     width: LARGE_SIZE,
@@ -46,7 +44,7 @@ export default StyleSheet.create({
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: isWeb ? 0 : height * 0.1,
+    marginTop: 0,
   },
 
   logo: {
@@ -58,7 +56,8 @@ export default StyleSheet.create({
     fontSize: 28,
     color: '#101419',
     fontFamily: 'Poppins-Bold',
-    margin: 0
+    marginLeft: 8,
+    textAlign: 'center',        // asegurar centrado de texto
   },
 
   subtitle: {
@@ -66,10 +65,20 @@ export default StyleSheet.create({
     color: '#101419',
     marginTop: 12,
     fontFamily: 'Poppins-ExtraLight',
+    textAlign: 'center',        // centrar subtítulo
   },
 
   form: {
     marginTop: 24,
+    alignSelf: 'center',        // centrar el formulario horizontalmente
+  },
+
+  errorText: {
+    color: '#FF3B30',
+    fontSize: 14,
+    fontFamily: 'Poppins-Medium',
+    textAlign: 'center',
+    marginBottom: 12,
   },
 
   label: {

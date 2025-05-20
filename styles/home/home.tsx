@@ -27,7 +27,7 @@ export default StyleSheet.create({
   icon: {
     width: 24,
     height: 24,
-    borderColor: 'FFFFFF'
+    borderColor: 'FFFFFF',
   },
 
   // Carrusel manual
@@ -89,6 +89,22 @@ export default StyleSheet.create({
     fontSize: 10,
     fontFamily: 'Poppins-Regular',
     color: '#A15E49',
+  },
+
+  addPetCard: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+    backgroundColor: '#30C5FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+
+  addPetIcon: {
+    width: 40,
+    height: 40,
+    tintColor: '#FFFFFF',
   },
 
   card: {

@@ -1,28 +1,19 @@
-// styles/perfil/perfilLocalStyles.ts
 import { StyleSheet, Platform, Dimensions } from 'react-native';
-import { TAB_BAR_HEIGHT } from './add_mascota';
-
 const { height } = Dimensions.get('window');
-
 export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
     paddingTop: Platform.OS === 'android' ? 25 : 0,
   },
-
   goBack: {
     position: 'absolute',
     top: Platform.OS === 'android' ? 25 : 0,
     left: 16,
     zIndex: 2,
   },
-  goBackIcon: {
-    width: 24,
-    height: 24,
-  },
+  goBackIcon: { width: 24, height: 24 },
 
-  // Header row for title and edit button
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -46,7 +37,6 @@ export default StyleSheet.create({
     fontFamily: 'Poppins-Medium',
     fontSize: 14,
   },
-
   profilePicContainer: {
     alignItems: 'center',
     marginTop: 16,
@@ -68,7 +58,6 @@ export default StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 8,
   },
-
   infoCard: {
     backgroundColor: '#F2E8E2',
     marginHorizontal: 16,
@@ -91,6 +80,32 @@ export default StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Poppins-Medium',
     color: '#101419',
+  },
+
+  /* Nuevos estilos de inline-edit */
+  editIcon: {
+    width: 18,
+    height: 18,
+    marginLeft: 8,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: 'Poppins-Medium',
+    color: '#101419',
+    borderBottomWidth: 1,
+    borderColor: '#A15E49',
+    paddingVertical: 2,
+  },
+  saveText: {
+    color: '#30C5FF',
+    fontFamily: 'Poppins-Medium',
+    marginLeft: 8,
+  },
+  cancelText: {
+    color: '#FF3B30',
+    fontFamily: 'Poppins-Medium',
+    marginLeft: 8,
   },
 
   petsCard: {
@@ -150,7 +165,7 @@ export default StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: TAB_BAR_HEIGHT,
+    height: 64,
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
@@ -158,14 +173,8 @@ export default StyleSheet.create({
     borderColor: '#EEE',
     backgroundColor: '#FFF',
   },
-  tabItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  tabIcon: {
-    width: 24,
-    height: 24,
-  },
+  tabItem: { flex: 1, alignItems: 'center' },
+  tabIcon: { width: 24, height: 24 },
   tabLabel: {
     marginTop: 4,
     fontSize: 10,

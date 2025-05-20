@@ -8,11 +8,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  TextInput,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import styles from '../../styles/perfil/perfil';
-// Define TAB_BAR_HEIGHT directly if not exported from the styles file
-const TAB_BAR_HEIGHT = 64;
 import { CameraModal } from '../../components/CameraModal';
 import { AuthContext } from '../../context/AuthContext';
 import { ProfileContext } from '../../context/ProfileContext';
@@ -29,6 +28,7 @@ import homeIcon     from '../../assets/images/home.png';
 import petbotIcon   from '../../assets/images/petbot.png';
 import mediaIcon    from '../../assets/images/media.png';
 import perfilIcon   from '../../assets/images/perfil.png';
+import editIcon     from '../../assets/images/editar.png';
 import { Routes } from '../../route';
 
 export default function Perfil() {
@@ -37,19 +37,9 @@ export default function Perfil() {
   const { name, email, pets, photoUrl, loading, refreshProfile } = useContext(ProfileContext);
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading]       = useState(false);
 
-  // Cierra sesión
-  const handleLogout = async () => {
-    try {
-      await logout();
-      router.replace(Routes.Login);
-    } catch {
-      Alert.alert('Error', 'No se pudo cerrar sesión.');
-    }
-  };
-
-  // Sube la imagen a Storage, guarda URL en Firestore y refresca contexto
+  // uploa de la foto
   const uploadToStorage = async (localUri: string) => {
     try {
       setUploading(true);
@@ -64,12 +54,9 @@ export default function Perfil() {
       await uploadBytes(storageRef, blob);
       const downloadUrl = await getDownloadURL(storageRef);
 
-      // Guarda URL en Firestore
+      // guarda URL en Firestore
       await updateDoc(doc(db, 'users', uid), { photoUrl: downloadUrl });
-
-      // Refresca nombre, email, photoUrl y pets
       await refreshProfile();
-
     } catch (err) {
       console.error(err);
       Alert.alert('Error', 'No se pudo subir la imagen.');
@@ -79,9 +66,40 @@ export default function Perfil() {
     }
   };
 
-  // Callback pasado al modal
-  const handleSetImage = (asset: { uri: string }) => {
-    if (asset.uri) uploadToStorage(asset.uri);
+  // inline-edit
+  const [editingField, setEditingField] = useState<'name' | 'email' | null>(null);
+  const [editingValue, setEditingValue] = useState('');
+
+  const startEditing = (field: 'name'|'email', current: string) => {
+    setEditingField(field);
+    setEditingValue(current);
+  };
+  const cancelEditing = () => {
+    setEditingField(null);
+    setEditingValue('');
+  };
+  const saveEditing = async () => {
+    try {
+      const uid = auth.currentUser?.uid;
+      if (!uid) throw new Error('Usuario no autenticado');
+      await updateDoc(doc(db, 'users', uid), {
+        [editingField!]: editingValue.trim(),
+      });
+      await refreshProfile();
+    } catch {
+      Alert.alert('Error', 'No se pudo guardar el cambio.');
+    } finally {
+      cancelEditing();
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.replace(Routes.Login);
+    } catch {
+      Alert.alert('Error', 'No se pudo cerrar sesión.');
+    }
   };
 
   if (loading) {
@@ -94,22 +112,17 @@ export default function Perfil() {
 
   return (
     <SafeAreaView style={styles.container}>
-
-      {/* Modal cámara/galería */}
       <CameraModal
         isVisible={modalVisible}
-        setImage={handleSetImage}
+        setImage={asset => asset.uri && uploadToStorage(asset.uri)}
         closeModal={() => setModalVisible(false)}
       />
 
-      {/* Botón “<-” */}
       <TouchableOpacity style={styles.goBack} onPress={() => router.replace(Routes.Home)}>
         <Image source={goBackIcon} style={styles.goBackIcon} />
       </TouchableOpacity>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: TAB_BAR_HEIGHT + 24 }}>
-
-        {/* Cabecera: saludo + editar foto */}
+      <ScrollView contentContainerStyle={{ paddingBottom: 64 + 24 }}>
         <View style={styles.headerRow}>
           <Text style={styles.title}>Hello, {name.split(' ')[0]}</Text>
           <TouchableOpacity
@@ -123,7 +136,6 @@ export default function Perfil() {
           </TouchableOpacity>
         </View>
 
-        {/* Foto de perfil */}
         <View style={styles.profilePicContainer}>
           <Image
             source={
@@ -135,20 +147,61 @@ export default function Perfil() {
           />
         </View>
 
-        {/* Información personal */}
         <Text style={styles.sectionTitle}>Información personal</Text>
         <View style={styles.infoCard}>
+          {/* Nombre */}
           <View style={styles.infoItem}>
             <Image source={personaIcon} style={styles.infoIcon} />
-            <Text style={styles.infoText}>{name}</Text>
+            {editingField === 'name'
+              ? <TextInput
+                  style={styles.textInput}
+                  value={editingValue}
+                  onChangeText={setEditingValue}
+                  autoFocus
+                />
+              : <Text style={styles.infoText}>{name}</Text>
+            }
+            {editingField === 'name'
+              ? (
+                <>
+                  <TouchableOpacity onPress={saveEditing}><Text style={styles.saveText}>Guardar</Text></TouchableOpacity>
+                  <TouchableOpacity onPress={cancelEditing}><Text style={styles.cancelText}>Cancelar</Text></TouchableOpacity>
+                </>
+              )
+              : <TouchableOpacity onPress={() => startEditing('name', name)}>
+                  <Image source={editIcon} style={styles.editIcon} />
+                </TouchableOpacity>
+            }
           </View>
+
+          {/* Email */}
           <View style={styles.infoItem}>
             <Image source={correoIcon} style={styles.infoIcon} />
-            <Text style={styles.infoText}>{email}</Text>
+            {editingField === 'email'
+              ? <TextInput
+                  style={styles.textInput}
+                  value={editingValue}
+                  onChangeText={setEditingValue}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoFocus
+                />
+              : <Text style={styles.infoText}>{email}</Text>
+            }
+            {editingField === 'email'
+              ? (
+                <>
+                  <TouchableOpacity onPress={saveEditing}><Text style={styles.saveText}>Guardar</Text></TouchableOpacity>
+                  <TouchableOpacity onPress={cancelEditing}><Text style={styles.cancelText}>Cancelar</Text></TouchableOpacity>
+                </>
+              )
+              : <TouchableOpacity onPress={() => startEditing('email', email)}>
+                  <Image source={editIcon} style={styles.editIcon} />
+                </TouchableOpacity>
+            }
           </View>
         </View>
 
-        {/* Mascotas */}
         <Text style={styles.sectionTitle}>Mis mascotas</Text>
         <View style={styles.petsCard}>
           {pets.length > 0
@@ -162,18 +215,15 @@ export default function Perfil() {
           }
         </View>
 
-        {/* + Añadir mascota (próximamente) */}
         <TouchableOpacity style={styles.addPetButton} onPress={() => router.replace(Routes.AddMascota)}>
           <Text style={styles.addPetText}>+ Añadir mascota</Text>
         </TouchableOpacity>
 
-        {/* Cerrar sesión */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutText}>Cerrar sesión</Text>
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Barra de pestañas */}
       <View style={styles.tabBar}>
         {[
           { icon: homeIcon,   label: 'Home',    route: Routes.Home   },

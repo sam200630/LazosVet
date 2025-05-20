@@ -17,6 +17,16 @@ import styles from '../../styles/home/home';
 import { PetsContext } from '../../context/PetsContext';
 import { DatesContext } from '../../context/DatesContext';
 
+// Importa imágenes estáticas
+import homeIcon from '../../assets/images/home.png';
+import petbotIcon from '../../assets/images/petbot.png';
+import mediaIcon from '../../assets/images/media.png';
+import perfilIcon from '../../assets/images/perfil.png';
+import notificacionesIcon from '../../assets/images/notificaciones.png';
+import defaultProfile from '../../assets/images/default-profile.jpeg';
+import calendarioIcon from '../../assets/images/calendario.png';
+import addIcon from '../../assets/images/+.png';
+
 // Colores de ejemplo para el carrusel
 const bannerColors = ['#FFC107', '#03A9F4', '#8BC34A'];
 
@@ -34,10 +44,10 @@ export default function Home() {
     setBannerIndex((bannerIndex + 1) % bannerColors.length);
 
   const tabs = [
-    { icon: require('../../assets/images/home.png'),    label: 'Home',    route: Routes.Home },
-    { icon: require('../../assets/images/petbot.png'),  label: 'Pet bot', route: Routes.Home },
-    { icon: require('../../assets/images/media.png'),   label: 'Media',   route: Routes.Media },
-    { icon: require('../../assets/images/perfil.png'),  label: 'Perfil',  route: Routes.Perfil },
+    { icon: homeIcon,    label: 'Home',    route: Routes.Home },
+    { icon: petbotIcon,  label: 'Pet bot', route: Routes.Home },
+    { icon: mediaIcon,   label: 'Media',   route: Routes.Media },
+    { icon: perfilIcon,  label: 'Perfil',  route: Routes.Perfil },
   ];
 
   // Ordena citas por fecha y hora, y toma la siguiente
@@ -55,9 +65,9 @@ export default function Home() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Home</Text>
-        <TouchableOpacity onPress={() => {/* notificaciones */}}>
+        <TouchableOpacity onPress={() => {/* Aquí irían las notificaciones */}}>
           <Image
-            source={require('../../assets/images/notificaciones.png')}
+            source={notificacionesIcon}
             style={styles.icon}
           />
         </TouchableOpacity>
@@ -90,68 +100,83 @@ export default function Home() {
           contentContainerStyle={styles.petsList}
         >
           {pets.map(p => (
-            <View key={p.id} style={styles.petCard}>
+            <TouchableOpacity
+              key={p.id}
+              style={styles.petCard}
+              onPress={() => router.push(`${Routes.Mascota}?id=${p.id}`)}
+            >
               <Image
                 source={
                   p.photoUrl
                     ? { uri: p.photoUrl }
-                    : require('../../assets/images/default-profile.jpeg')
+                    : defaultProfile
                 }
                 style={styles.petPlaceholder}
               />
               <Text style={styles.petName}>{p.name}</Text>
-            </View>
+            </TouchableOpacity>
           ))}
+
+          {/* Cuadro para añadir mascota */}
+          <TouchableOpacity
+            style={[styles.petCard, styles.addPetCard]}
+            onPress={() => router.push(Routes.AddMascota)}
+          >
+            <Image
+              source={addIcon}
+              style={styles.addPetIcon}
+            />
+          </TouchableOpacity>
         </ScrollView>
 
         {/* Próximas citas */}
-<Text style={styles.sectionTitle}>Próximas citas</Text>
-{loadingDates ? (
-  <ActivityIndicator style={{ marginVertical: 16 }} size="small" color="#30C5FF" />
-) : nextDate ? (
-  <View style={styles.card}>
-    <View style={styles.cardHeader}>
-      <Image
-        source={require('../../assets/images/calendario.png')}
-        style={styles.cardIcon}
-      />
-      <Text style={styles.cardTitle}>
-        {`${nextDate.reason} ${nextDate.petName}`}
-      </Text>
-    </View>
-    <Text style={styles.cardDate}>
-      {`${nextDate.date}, ${nextDate.time}`}
-    </Text>
-    <View style={styles.cardButtons}>
-      {/* Este botón conserva la navegación a "Añadir cita" */}
-      <TouchableOpacity
-        style={styles.cardButton}
-        onPress={() => router.push(Routes.AddAppointment)}
-      >
-        <Text style={styles.cardButtonText}>+ Añadir cita</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.cardButton}>
-        <Text style={styles.cardButtonText}>Ver todos</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.cardButton}>
-        <Text style={styles.cardButtonText}>Ver QR</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-) : (
-  <><Text style={{ marginHorizontal: 16, color: '#666' }}>
-                No tienes citas próximas.
+        <Text style={styles.sectionTitle}>Próximas citas</Text>
+        {loadingDates ? (
+          <ActivityIndicator style={{ marginVertical: 16 }} size="small" color="#30C5FF" />
+        ) : nextDate ? (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Image
+                source={calendarioIcon}
+                style={styles.cardIcon}
+              />
+              <Text style={styles.cardTitle}>
+                {`${nextDate.reason} ${nextDate.petName}`}
               </Text>
+            </View>
+            <Text style={styles.cardDate}>
+              {`${nextDate.date}, ${nextDate.time}`}
+            </Text>
+            <View style={styles.cardButtons}>
               <TouchableOpacity
                 style={styles.cardButton}
                 onPress={() => router.push(Routes.AddAppointment)}
               >
-                  <Text style={styles.cardButtonText}>+ Añadir cita</Text>
-                </TouchableOpacity></>
-  
-)}
-  </ScrollView>
+                <Text style={styles.cardButtonText}>+ Añadir cita</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.cardButton}>
+                <Text style={styles.cardButtonText}>Ver todos</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.cardButton}>
+                <Text style={styles.cardButtonText}>Ver QR</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <>
+            <Text style={{ marginHorizontal: 16, color: '#666' }}>
+              No tienes citas próximas.
+            </Text>
+            <TouchableOpacity
+              style={styles.cardButton}
+              onPress={() => router.push(Routes.AddAppointment)}
+            >
+              <Text style={styles.cardButtonText}>+ Añadir cita</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </ScrollView>
 
       {/* Bottom Tabs */}
       <View style={styles.tabBar}>

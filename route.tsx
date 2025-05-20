@@ -6,4 +6,5 @@ export const Routes = {
   Perfil: 'perfil/perfil',
   AddMascota: 'perfil/add_mascota',
   Media: 'media/principal',
+  Mascota: 'perfil/mascota',
 };
