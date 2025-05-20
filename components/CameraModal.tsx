@@ -1,97 +1,169 @@
-// CameraModal.tsx
+// components/CameraModal.tsx
 
-import { View, Text, Modal, TouchableOpacity, Image } from "react-native";
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera'; // Correct import for react-native-camera
-import * as ImagePicker from 'expo-image-picker';
 import React, { useRef, useState } from "react";
+import {
+  View,
+  Text,
+  Modal,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Platform,
+} from "react-native";
+import {
+  CameraView,
+  CameraType,
+  useCameraPermissions,
+} from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
 
-// Interfaz para las propiedades del componente CameraModal
+// Iconos de tu carpeta assets
+import goBackIcon from "../assets/images/goBack.png";
+
 interface CameraModalProps {
   isVisible: boolean;
-  setImage: (image: any) => void; // Función para actualizar la imagen en el componente padre (por ejemplo, AdminMenu)
-  closeModal: () => void; // Función para cerrar el modal
+  setImage: (image: any) => void;
+  closeModal: () => void;
 }
 
-// Componente CameraModal
 export function CameraModal(props: CameraModalProps) {
-  // Se extraen las propiedades pasadas al componente
   const { isVisible, setImage, closeModal } = props;
-  // Estado que guarda el tipo de cámara (back o front)
-  const [facing, setFacing] = useState<CameraType>('back');
-  // Se solicitan los permisos de cámara
+  const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
-  // Referencia para acceder al componente CameraView
   const cameraRef = useRef<CameraView | null>(null);
 
-  // Función para cambiar el tipo de cámara (flip)
-  const flip = async () => {
-    setFacing(facing === 'back' ? 'front' : 'back');
+  const flip = () => {
+    setFacing((f) => (f === "back" ? "front" : "back"));
   };
 
-  // Función para tomar una foto con la cámara
   const take = async () => {
-    let result = await cameraRef.current?.takePictureAsync({
+    const result = await cameraRef.current?.takePictureAsync({
       quality: 1,
       base64: true,
     });
-
-    if (result && result.uri) {
-      setImage(result);  // Actualiza la imagen en el componente padre
-      closeModal();  // Cierra el modal después de tomar la foto
+    if (result?.uri) {
+      setImage(result);
+      closeModal();
     }
   };
 
-  // Función para abrir la biblioteca de imágenes y seleccionar una imagen
   const open = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-
-    // Si la selección no fue cancelada y hay imágenes disponibles, actualiza la imagen y cierra el modal
-    if (!result.canceled && result.assets) {
+    if (!result.canceled && result.assets.length) {
       setImage(result.assets[0]);
       closeModal();
     }
   };
 
-  // Si no se ha obtenido permiso, muestra una vista vacía
-  if (!permission) {
-    return <View />;
-  }
-
-  // Si no se han concedido los permisos, se muestra un mensaje y un botón para solicitarlos
+  if (!permission) return <View />;
   if (!permission.granted) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>We need your permission to show the camera</Text>
-        <TouchableOpacity onPress={requestPermission}>
-          <Text>Grant Permission</Text>
+      <View style={styles.permissionContainer}>
+        <Text style={styles.permissionText}>
+          Necesitamos permiso para usar la cámara
+        </Text>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={requestPermission}
+        >
+          <Text style={styles.actionText}>Conceder permiso</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
-  // Renderiza el Modal con la cámara y tres botones: tomar foto, abrir galería, cambiar cámara
   return (
     <Modal visible={isVisible} transparent={false} animationType="slide">
-      <View style={{ flex: 1 }}>
-        <CameraView style={{ flex: 1 }} facing={facing} ref={cameraRef}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-around', position: 'absolute', bottom: 30, width: '100%' }}>
-            <TouchableOpacity onPress={take} style={{ backgroundColor: 'lightblue', padding: 10 }}>
-              <Text>Take a Photo</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={open} style={{ backgroundColor: 'lightgreen', padding: 10 }}>
-              <Text>Open Library</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={flip} style={{ backgroundColor: 'lightcoral', padding: 10 }}>
-              <Text>Flip Camera</Text>
-            </TouchableOpacity>
-          </View>
-        </CameraView>
+      <View style={styles.fullscreen}>
+        {/* Botón volver */}
+        <TouchableOpacity style={styles.backBtn} onPress={closeModal}>
+          <Image source={goBackIcon} style={styles.backIcon} />
+        </TouchableOpacity>
+
+        {/* Vista de cámara */}
+        <CameraView
+          style={styles.fullscreen}
+          facing={facing}
+          ref={cameraRef}
+        />
+
+        {/* Controles inferiores */}
+        <View style={styles.controls}>
+          <TouchableOpacity style={styles.controlBtn} onPress={take}>
+            <Text style={styles.controlText}>Tomar foto</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.controlBtn} onPress={open}>
+            <Text style={styles.controlText}>Galería</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.controlBtn} onPress={flip}>
+            <Text style={styles.controlText}>Cambiar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Modal>
   );
 }
+
+const styles = StyleSheet.create({
+  fullscreen: {
+    flex: 1,
+    backgroundColor: "#000",
+  },
+  backBtn: {
+    position: "absolute",
+    top: Platform.OS === "android" ? 25 : 10,
+    left: 16,
+    zIndex: 2,
+  },
+  backIcon: {
+    width: 24,
+    height: 24,
+    tintColor: "#FFF",
+  },
+  permissionContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+  permissionText: {
+    fontFamily: "Poppins-Regular",
+    fontSize: 16,
+    color: "#101419",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  actionButton: {
+    backgroundColor: "#30C5FF",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 24,
+  },
+  actionText: {
+    color: "#FFF",
+    fontFamily: "Poppins-Medium",
+  },
+  controls: {
+    position: "absolute",
+    bottom: 30,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  controlBtn: {
+    backgroundColor: "#30C5FF",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 24,
+  },
+  controlText: {
+    color: "#FFF",
+    fontFamily: "Poppins-Medium",
+    fontSize: 14,
+  },
+});
