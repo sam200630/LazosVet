@@ -15,9 +15,8 @@ import {
 import { useRouter } from 'expo-router';
 import { Routes } from '../../route';
 import styles from '../../styles/citas/add_cita';
-import { PetsContext } from '../../context/PetsContext';  // <-- import context
-import { DatesContext } from '../../context/DatesContext'; // <-- import context
-
+import { PetsContext } from '../../context/PetsContext';  
+import { DatesContext } from '../../context/DatesContext'; 
 // Imports estáticos
 import goBackIcon   from '../../assets/images/goBack.png';
 import pawIcon      from '../../assets/images/huellaGrande.png';

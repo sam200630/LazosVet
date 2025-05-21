@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// app/chat.tsx
+import React, { useState, useContext, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -7,6 +8,7 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
   useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -21,16 +23,37 @@ import homeIcon   from '../../assets/images/home.png';
 import mediaIcon  from '../../assets/images/media.png';
 import perfilIcon from '../../assets/images/perfil.png';
 
+// Contexto y auth
+import { PetBotContext } from '../../context/PetBotContext';
+import { auth } from '../../utils/FirebaseConfig';
+
 export default function Chat() {
   const router = useRouter();
   const { height } = useWindowDimensions();
+  const userId = auth.currentUser?.uid ?? 'anonymous';
 
-  const [messages, setMessages] = useState<string[]>([]);
-  const [query, setQuery]       = useState<string>('');
+  const {
+    messages,
+    sendMessage,
+    getChats,
+    getMessages,
+    isLoading,
+  } = useContext(PetBotContext);
+
+  const [query, setQuery] = useState<string>('');
+
+  // Al montar, carga la lista de chats y mensajes del primero (opcional)
+  useEffect(() => {
+    (async () => {
+      await getChats(userId);
+      // Si solo tienes un chat “PetBot” fijo:
+      await getMessages(userId, 'PetBot');
+    })();
+  }, [userId]);
 
   const handleSend = () => {
     if (!query.trim()) return;
-    setMessages(prev => [...prev, query.trim()]);
+    sendMessage(userId, query.trim());
     setQuery('');
   };
 
@@ -49,7 +72,7 @@ export default function Chat() {
         <Text style={styles.headerTitle}>Pet bot</Text>
       </View>
 
-      {/* Mensajes (flex:1) */}
+      {/* Mensajes */}
       <ScrollView
         style={[styles.messagesContainer, { maxHeight: height * 0.65 }]}
         contentContainerStyle={styles.messagesContent}
@@ -61,15 +84,18 @@ export default function Chat() {
         ) : (
           messages.map((m, i) => (
             <View key={i} style={styles.bubble}>
-              <Text style={styles.bubbleText}>{m}</Text>
+              <Text style={styles.bubbleText}>{m.text}</Text>
+              <Text style={styles.bubbleText}>
+                {new Date(m.timestamp).toLocaleTimeString()}
+              </Text>
             </View>
           ))
         )}
       </ScrollView>
 
-      {/* Input fijo */}
+      {/* Input */}
       <View style={styles.inputContainer}>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity style={styles.iconButton} disabled>
           <Image source={addIcon} style={styles.icon} />
         </TouchableOpacity>
         <TextInput
@@ -79,12 +105,19 @@ export default function Chat() {
           value={query}
           onChangeText={setQuery}
         />
-        <TouchableOpacity style={styles.iconButton} onPress={handleSend}>
-          <Image source={sendIcon} style={styles.icon} />
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={handleSend}
+          disabled={isLoading}
+        >
+          {isLoading
+            ? <ActivityIndicator />
+            : <Image source={sendIcon} style={styles.icon} />
+          }
         </TouchableOpacity>
       </View>
 
-      {/* Bottom Tabs fijo al fondo */}
+      {/* Bottom Tabs */}
       <View style={styles.tabBar}>
         {tabs.map((tab, i) => (
           <TouchableOpacity
