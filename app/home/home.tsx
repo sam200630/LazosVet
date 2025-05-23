@@ -158,16 +158,18 @@ export default function Home() {
     {expanded && (
       <View style={{ maxHeight: 200, marginTop: 12 }}>
         <ScrollView showsVerticalScrollIndicator={true}>
-          {allDates.map((cita) => (
-            <View key={cita.id} style={{ marginBottom: 8 }}>
-              <Image
-                source={calendarioIcon}
-                style={styles.cardIcon}
-              />
-              <Text style={styles.cardTitle}>{`${cita.reason} ${cita.petName}`}</Text>
-              <Text style={styles.cardDate}>
-                {`${cita.date}, ${cita.time}`}
-              </Text>
+      {allDates.map((cita) => (
+        <View key={cita.id}>
+          <View style={styles.cardHeader}>
+            <Image
+              source={calendarioIcon}
+              style={styles.cardIcon}
+            />
+            <Text style={styles.cardTitle}>{`${cita.reason} ${cita.petName}`}</Text>
+          </View>
+          <Text style={styles.cardDate}>
+            {`${cita.date}, ${cita.time}`}
+          </Text>
         </View>
       ))}
     </ScrollView>
