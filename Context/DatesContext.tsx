@@ -10,6 +10,7 @@ import {
   where,
   serverTimestamp,
   DocumentData,
+  getDocs,
 } from 'firebase/firestore';
 import { AuthContext } from './AuthContext';
 import { PetsContext, Pet } from './PetsContext';
@@ -36,6 +37,7 @@ export interface DatesContextType {
     time: string;
   }) => Promise<void>;
   refreshDates: () => void;
+  OtherDates : () => Promise<DateType[]>;
 }
 
 export const DatesContext = createContext<DatesContextType>({
@@ -44,6 +46,7 @@ export const DatesContext = createContext<DatesContextType>({
   petOptions: [],
   addDate: async () => {},
   refreshDates: () => {},
+  OtherDates: async () => [],
 });
 
 export const DatesProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -118,16 +121,45 @@ export const DatesProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const refreshDates = () => {
-    // el onSnapshot ya trae datos en tiempo real,
-    // pero proporcionamos este método por si lo necesitas manualmente
-    // (p. ej. tras eliminar o editar)
+    
     setLoading(true);
-    // no-op: onSnapshot se encarga
+    
   };
+
+  const OtherDates = async (): Promise<DateType[]> => {
+  if (!user) throw new Error('Usuario no autenticado');
+  const q = query(collection(db, 'dates'), where('userId', '==', user.uid));
+  const snap = await getDocs(q);
+
+  const citas: DateType[] = snap.docs.map(d => {
+    const data = d.data() as DocumentData;
+    return {
+      id: d.id,
+      petId: data.petId,
+      petName: data.petName,
+      reason: data.reason,
+      notes: data.notes || '',
+      date: data.date,
+      time: data.time,
+    };
+  });
+
+  // Ordenar por fecha y hora
+  const sorted = [...citas].sort((a, b) => {
+    const aDate = new Date(`${a.date}T${a.time}`);
+    const bDate = new Date(`${b.date}T${b.time}`);
+    return aDate.getTime() - bDate.getTime();
+  });
+
+  // Retorna todo excepto la primera (más próxima)
+  return sorted.slice(1);
+};
+
+
 
   return (
     <DatesContext.Provider
-      value={{ dates, loading, petOptions: pets, addDate, refreshDates }}
+      value={{ dates, loading, petOptions: pets, addDate, refreshDates, OtherDates }}
     >
       {children}
     </DatesContext.Provider>

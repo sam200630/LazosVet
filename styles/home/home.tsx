@@ -35,6 +35,7 @@ export default StyleSheet.create({
     alignSelf: 'center',
     marginHorizontal: 16,
     position: 'relative',
+    height: "auto",
   },
   bannerPlaceholder: {
     height: 160,
@@ -44,7 +45,7 @@ export default StyleSheet.create({
     position: 'absolute',
     top: 0,
     bottom: 0,
-    width: '50%',
+    width: '60%',
   },
   navLeft: {
     left: 0,
@@ -52,6 +53,14 @@ export default StyleSheet.create({
   navRight: {
     right: 0,
   },
+  bannerImage: {
+  width: '100%',
+  height: 250,
+  borderRadius: 12,
+  overflow: 'hidden',
+},
+
+
 
   sectionTitle: {
     fontSize: 18,
