@@ -28,23 +28,24 @@ export interface DateType {
 export interface DatesContextType {
   dates: DateType[];
   loading: boolean;
-  petOptions: Pet[];  // para el dropdown de mascotas
+  petOptions: Pet[];
+  /** ← CAMBIO: ahora devuelve Promise<string> en lugar de void */
   addDate: (data: {
     petId: string;
     reason: string;
     notes?: string;
     date: string;
     time: string;
-  }) => Promise<void>;
+  }) => Promise<string>;
   refreshDates: () => void;
-  OtherDates : () => Promise<DateType[]>;
+  OtherDates: () => Promise<DateType[]>;
 }
 
 export const DatesContext = createContext<DatesContextType>({
   dates: [],
   loading: true,
   petOptions: [],
-  addDate: async () => {},
+  addDate: async () => '',        // ← CAMBIO: retorna string vacío
   refreshDates: () => {},
   OtherDates: async () => [],
 });
@@ -57,7 +58,6 @@ export const DatesProvider: React.FC<{ children: React.ReactNode }> = ({
   const [dates, setDates] = useState<DateType[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // escucha real-time de citas (dates) para este usuario
   useEffect(() => {
     if (!user) {
       setDates([]);
@@ -88,7 +88,7 @@ export const DatesProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => unsubscribe();
   }, [user]);
 
-  // función para agregar una nueva cita
+  /** ← CAMBIO: ahora devuelve el id del nuevo documento */
   const addDate = async ({
     petId,
     reason,
@@ -101,13 +101,11 @@ export const DatesProvider: React.FC<{ children: React.ReactNode }> = ({
     notes?: string;
     date: string;
     time: string;
-  }) => {
+  }): Promise<string> => {
     if (!user) throw new Error('Usuario no autenticado');
-    // buscar nombre de la mascota seleccionada
     const pet = pets.find(p => p.id === petId);
     const petName = pet ? pet.name : '';
-    // crea documento en "dates"
-    await addDoc(collection(db, 'dates'), {
+    const docRef = await addDoc(collection(db, 'dates'), {
       userId: user.uid,
       petId,
       petName,
@@ -117,45 +115,39 @@ export const DatesProvider: React.FC<{ children: React.ReactNode }> = ({
       time,
       createdAt: serverTimestamp(),
     });
-    // onSnapshot auto-refresca la lista
+    return docRef.id;                // ← CAMBIO: retornamos el id
   };
 
   const refreshDates = () => {
-    
     setLoading(true);
-    
   };
 
   const OtherDates = async (): Promise<DateType[]> => {
-  if (!user) throw new Error('Usuario no autenticado');
-  const q = query(collection(db, 'dates'), where('userId', '==', user.uid));
-  const snap = await getDocs(q);
+    if (!user) throw new Error('Usuario no autenticado');
+    const q = query(collection(db, 'dates'), where('userId', '==', user.uid));
+    const snap = await getDocs(q);
 
-  const citas: DateType[] = snap.docs.map(d => {
-    const data = d.data() as DocumentData;
-    return {
-      id: d.id,
-      petId: data.petId,
-      petName: data.petName,
-      reason: data.reason,
-      notes: data.notes || '',
-      date: data.date,
-      time: data.time,
-    };
-  });
+    const citas: DateType[] = snap.docs.map(d => {
+      const data = d.data() as DocumentData;
+      return {
+        id: d.id,
+        petId: data.petId,
+        petName: data.petName,
+        reason: data.reason,
+        notes: data.notes || '',
+        date: data.date,
+        time: data.time,
+      };
+    });
 
-  // Ordenar por fecha y hora
-  const sorted = [...citas].sort((a, b) => {
-    const aDate = new Date(`${a.date}T${a.time}`);
-    const bDate = new Date(`${b.date}T${b.time}`);
-    return aDate.getTime() - bDate.getTime();
-  });
+    const sorted = [...citas].sort((a, b) => {
+      const aDate = new Date(`${a.date}T${a.time}`);
+      const bDate = new Date(`${b.date}T${b.time}`);
+      return aDate.getTime() - bDate.getTime();
+    });
 
-  // Retorna todo excepto la primera (más próxima)
-  return sorted.slice(1);
-};
-
-
+    return sorted.slice(1);
+  };
 
   return (
     <DatesContext.Provider

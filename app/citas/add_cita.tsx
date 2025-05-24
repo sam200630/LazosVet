@@ -1,3 +1,5 @@
+// app/citas/AddAppointment.tsx
+
 import React, { useState, useMemo, useContext } from 'react';
 import {
   View,
@@ -42,6 +44,7 @@ export default function AddAppointment() {
   const [date, setDate]     = useState('');
   const [time, setTime]     = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading]   = useState(false);           // ← CAMBIO: estado de loading
 
   // Dropdowns / calendarios
   const [showPetDropdown, setShowPetDropdown]       = useState(false);
@@ -98,9 +101,7 @@ export default function AddAppointment() {
   const minDate = `${yyyy}-${mm}-${dd}`;
 
   const handleDate = async () => {
-    // Limpiar errores antiguos
     setErrorMsg('');
-
     // Validar conflicto
     const conflict = filteredTimeOptions.find(o => o.time === time && o.disabled);
     if (conflict) {
@@ -116,16 +117,22 @@ export default function AddAppointment() {
     if (!selected) return;
 
     try {
-      await addDate({
+      setLoading(true);                                      // ← CAMBIO: mostramos loader
+      // ← CAMBIO: llamamos a addDate y recogemos el nuevo ID
+      const newId = await addDate({
         petId: selected.id,
         reason,
         notes: extra,
         date,
         time,
       });
-      router.replace(Routes.Home);
-    } catch {
+      // ← CAMBIO: navegamos a la pantalla QR con ?id=newId
+      router.replace(`${Routes.QR}?id=${newId}`);
+    } catch (e) {
+      console.error(e);
       setErrorMsg('No se pudo agendar la cita. Intenta de nuevo.');
+    } finally {
+      setLoading(false);                                     // ← CAMBIO: ocultamos loader
     }
   };
 
@@ -208,19 +215,19 @@ export default function AddAppointment() {
           </TouchableOpacity>
           {showReasonDropdown && (
             <View style={styles.dropdown}>
-              {reasonOptions.map(o => (
+              {['Baño', 'Consulta', 'Control'].map(o => (
                 <TouchableOpacity
                   key={o}
-                    style={styles.option}
-                    onPress={() => {
-                      setReason(o);
-                      setShowReasonDropdown(false);
-                      setErrorMsg('');
-                    }}
-                  >
-                    <Text style={styles.optionText}>{o}</Text>
-                  </TouchableOpacity>
-                ))}
+                  style={styles.option}
+                  onPress={() => {
+                    setReason(o);
+                    setShowReasonDropdown(false);
+                    setErrorMsg('');
+                  }}
+                >
+                  <Text style={styles.optionText}>{o}</Text>
+                </TouchableOpacity>
+              ))}
             </View>
           )}
         </View>
@@ -309,11 +316,15 @@ export default function AddAppointment() {
 
         {/* Botón */}
         <TouchableOpacity
-          style={[styles.button, !isValid && styles.buttonDisabled]}
-          disabled={!isValid}
+          style={[styles.button, (!isValid || loading) && styles.buttonDisabled]} // ← CAMBIO: también deshabilita si loading
+          disabled={!isValid || loading}                                       // ← CAMBIO
           onPress={handleDate}
         >
-          <Text style={styles.buttonText}>Generar confirmación</Text>
+          {loading ? (                             // ← CAMBIO: mostramos loader
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.buttonText}>Generar confirmación</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
 

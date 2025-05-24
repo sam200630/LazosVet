@@ -184,19 +184,32 @@ export default function Home() {
                 {`${nextDate.reason} ${nextDate.petName}`}
               </Text>
             </View>
+            
+            
             <View style={styles.cardDateRow}>
               <Text style={styles.cardDate}>
                 {`${nextDate.date}, ${nextDate.time}`}
               </Text>
-              <TouchableOpacity
-                style={styles.detailButton}
-                onPress={() =>
-                  router.push(`${Routes.DetallesCita}?id=${nextDate.id}`)
-                }
-              >
-                <Text style={styles.detailButtonText}>Detalles</Text>
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity
+                  style={styles.detailButton}
+                  onPress={() =>
+                    router.push(`${Routes.DetallesCita}?id=${nextDate.id}`)
+                  }
+                >
+                  <Text style={styles.detailButtonText}>Detalles</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.detailButton}
+                  onPress={() =>
+                    router.push(`${Routes.QR}?id=${nextDate.id}`)
+                  }
+                >
+                  <Text style={styles.detailButtonText}>Ver QR</Text>
+                </TouchableOpacity>
+              </View>
             </View>
+
 
             {/* Lista Expandible */}
             <Animated.View
@@ -215,21 +228,32 @@ export default function Home() {
                         {`${cita.reason} ${cita.petName}`}
                       </Text>
                     </View>
+                    
                     <View style={styles.cardDateRow}>
-                      <Text style={styles.cardDate}>
-                        {`${cita.date}, ${cita.time}`}
-                      </Text>
-                      <TouchableOpacity
-                        style={styles.detailButton}
-                        onPress={() =>
-                          router.push(`${Routes.DetallesCita}?id=${cita.id}`)
-                        }
-                      >
-                        <Text style={styles.detailButtonText}>Detalles</Text>
-                      </TouchableOpacity>
-                    </View>
+                  <Text style={styles.cardDate}>
+                    {`${cita.date}, ${cita.time}`}
+                  </Text>
+                  <View style={{ flexDirection: 'row', marginInline: 8 }}>
+                    <TouchableOpacity
+                      style={styles.detailButton}
+                      onPress={() =>
+                        router.push(`${Routes.DetallesCita}?id=${cita.id}`)
+                      }
+                    >
+                      <Text style={styles.detailButtonText}>Detalles</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.detailButton}
+                      onPress={() =>
+                        router.push(`${Routes.QR}?id=${cita.id}`)
+                      }
+                    >
+                      <Text style={styles.detailButtonText}>Ver QR</Text>
+                    </TouchableOpacity>
                   </View>
-                ))}
+                </View>
+              </View>
+            ))}
               </ScrollView>
             </Animated.View>
 
@@ -245,12 +269,6 @@ export default function Home() {
                 <Text style={styles.cardButtonText}>
                   {expanded ? 'Ocultar' : 'Ver todos'}
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.cardButton}
-                onPress={() => router.push(Routes.QR)}
-              >
-                <Text style={styles.cardButtonText}>Ver QR</Text>
               </TouchableOpacity>
             </View>
           </View>
