@@ -8,4 +8,6 @@ export const Routes = {
   Media: 'media/principal',
   Mascota: 'perfil/mascota',
   Petbot: 'petBot/chat',
+  QR: 'citas/qr',
+  DetallesCita: 'citas/detalles',
 };
