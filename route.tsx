@@ -9,4 +9,5 @@ export const Routes = {
   Mascota: 'perfil/mascota',
   Petbot: 'petBot/chat',
   QR: 'citas/qr',
+  DetallesCita: 'citas/detalles',
 };

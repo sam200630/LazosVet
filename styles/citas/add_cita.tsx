@@ -44,6 +44,22 @@ export default StyleSheet.create({
     paddingBottom: TAB_BAR_HEIGHT + 24,
   },
 
+  // Banner de error
+  errorBanner: {
+    backgroundColor: '#FDECEA',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#F5C6CB',
+  },
+  errorText: {
+    color: '#A94442',
+    fontFamily: 'Poppins-Medium',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+
   label: {
     fontSize: 14,
     fontFamily: 'Poppins-Medium',
@@ -68,15 +84,6 @@ export default StyleSheet.create({
     borderRadius: 12,
   },
 
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  half: {
-    width: '48%',
-  },
-
-  // Selector personalizado
   selectorWrapper: {
     marginBottom: 16,
   },
@@ -118,8 +125,10 @@ export default StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: '#101419',
   },
+  optionDisabledText: {
+    color: '#CCC',
+  },
 
-  // Calendar wrapper
   calendarWrapper: {
     marginBottom: 16,
   },
@@ -129,7 +138,6 @@ export default StyleSheet.create({
     overflow: 'hidden',
   },
 
-  // Botón
   button: {
     height: 48,
     backgroundColor: '#30C5FF',

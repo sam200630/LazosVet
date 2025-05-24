@@ -1,6 +1,6 @@
 import { StyleSheet, Platform, Dimensions } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
 
 export default StyleSheet.create({
@@ -119,15 +119,39 @@ export default StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: '#101419',
   },
+
+  // Fila de fecha y botón detalles
+  cardDateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   cardDate: {
     fontSize: 10,
     fontFamily: 'Poppins-Light',
     color: '#101419',
-    marginBottom: 12,
   },
+
+  // Botón ver detalles
+  detailButton: {
+    borderWidth: 1,
+    borderColor: '#101419',
+    backgroundColor: 'transparent',
+    borderRadius: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  detailButtonText: {
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    color: '#101419',
+  },
+
   cardButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 12,
   },
   cardButton: {
     flex: 1,

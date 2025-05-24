@@ -1,5 +1,3 @@
-// app/citas/add_cita.tsx
-
 import React, { useState, useMemo, useContext } from 'react';
 import {
   View,
@@ -17,6 +15,7 @@ import { Routes } from '../../route';
 import styles from '../../styles/citas/add_cita';
 import { PetsContext } from '../../context/PetsContext';  
 import { DatesContext } from '../../context/DatesContext'; 
+
 // Imports estáticos
 import goBackIcon   from '../../assets/images/goBack.png';
 import pawIcon      from '../../assets/images/huellaGrande.png';
@@ -32,25 +31,27 @@ import { Calendar } from 'react-native-calendars';
 export default function AddAppointment() {
   const router = useRouter();
 
-  // Consume PetsContext
+  // Contextos
   const { pets, loading: loadingPets } = useContext(PetsContext);
-  const { addDate } = useContext(DatesContext); 
+  const { dates, addDate } = useContext(DatesContext);
 
+  // State del formulario
   const [pet, setPet]       = useState('');
   const [reason, setReason] = useState('');
   const [extra, setExtra]   = useState('');
   const [date, setDate]     = useState('');
   const [time, setTime]     = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
+  // Dropdowns / calendarios
   const [showPetDropdown, setShowPetDropdown]       = useState(false);
   const [showReasonDropdown, setShowReasonDropdown] = useState(false);
   const [showDateCalendar, setShowDateCalendar]     = useState(false);
   const [showTimeDropdown, setShowTimeDropdown]     = useState(false);
 
-
   const reasonOptions = ['Baño', 'Consulta', 'Control'];
 
-  // Generar horas cada 30min
+  // Horas cada 30minuto entre 08:00–17:30
   const timeOptions = useMemo(() => {
     const arr: string[] = [];
     for (let h = 8; h <= 17; h++) {
@@ -58,23 +59,36 @@ export default function AddAppointment() {
         if (h === 17 && m === '30') {
           arr.push('17:30');
         } else if (h < 17) {
-          arr.push(`${String(h).padStart(2, '0')}:${m}`);
+          arr.push(`${String(h).padStart(2,'0')}:${m}`);
         }
       });
     }
     return arr;
   }, []);
 
-  const isDateValid = Boolean(date);
-  const isTimeValid = timeOptions.includes(time);
-  const isValid     = Boolean(pet && reason && isDateValid && isTimeValid);
+  // Filtrar horas en conflicto
+  const filteredTimeOptions = timeOptions.map(t => {
+    let disabled = false;
+    if (date && reason) {
+      const conflict = dates.some(d =>
+        d.date === date &&
+        d.time === t &&
+        (
+          reason === 'Baño'
+            ? d.reason === 'Baño'
+            : ['Consulta','Control'].includes(reason)
+              ? ['Consulta','Control'].includes(d.reason)
+              : false
+        )
+      );
+      disabled = conflict;
+    }
+    return { time: t, disabled };
+  });
 
-  const tabs = [
-    { icon: homeIcon,   label: 'Home',    route: Routes.Home   },
-    { icon: petbotIcon, label: 'Pet bot', route: Routes.Home   },
-    { icon: mediaIcon,  label: 'Media',   route: Routes.Media  },
-    { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil },
-  ];
+  const isValid =
+    Boolean(pet && reason && date && time) &&
+    !filteredTimeOptions.find(o => o.time === time && o.disabled);
 
   // Fecha mínima = hoy
   const today = new Date();
@@ -84,17 +98,43 @@ export default function AddAppointment() {
   const minDate = `${yyyy}-${mm}-${dd}`;
 
   const handleDate = async () => {
+    // Limpiar errores antiguos
+    setErrorMsg('');
+
+    // Validar conflicto
+    const conflict = filteredTimeOptions.find(o => o.time === time && o.disabled);
+    if (conflict) {
+      setErrorMsg(
+        reason === 'Baño'
+          ? 'Ya hay un baño agendado para este día y hora.'
+          : 'Ya hay una consulta o control agendado para este día y hora.'
+      );
+      return;
+    }
+
     const selected = pets.find(p => p.name === pet);
     if (!selected) return;
-    await addDate({
-      petId: selected.id,
-      reason,
-      notes: extra,
-      date,
-      time,
-    });
-    router.replace(Routes.Home);
+
+    try {
+      await addDate({
+        petId: selected.id,
+        reason,
+        notes: extra,
+        date,
+        time,
+      });
+      router.replace(Routes.Home);
+    } catch {
+      setErrorMsg('No se pudo agendar la cita. Intenta de nuevo.');
+    }
   };
+
+  const tabs = [
+    { icon: homeIcon,   label: 'Home',    route: Routes.Home   },
+    { icon: petbotIcon, label: 'Pet bot', route: Routes.Home   },
+    { icon: mediaIcon,  label: 'Media',   route: Routes.Media  },
+    { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil },
+  ];
 
   return (
     <KeyboardAvoidingView
@@ -112,6 +152,13 @@ export default function AddAppointment() {
 
         <Text style={styles.title}>Añadir cita</Text>
 
+        {/* Banner de error */}
+        {errorMsg ? (
+          <View style={styles.errorBanner}>
+            <Text style={styles.errorText}>{errorMsg}</Text>
+          </View>
+        ) : null}
+
         {/* Mascota */}
         <Text style={styles.label}>Mascota</Text>
         <View style={styles.selectorWrapper}>
@@ -124,7 +171,6 @@ export default function AddAppointment() {
             </Text>
             <Image source={expanderIcon} style={styles.expanderIcon} />
           </TouchableOpacity>
-
           {showPetDropdown && (
             <View style={styles.dropdown}>
               {loadingPets ? (
@@ -134,7 +180,11 @@ export default function AddAppointment() {
                   <TouchableOpacity
                     key={p.id}
                     style={styles.option}
-                    onPress={() => { setPet(p.name); setShowPetDropdown(false); }}
+                    onPress={() => {
+                      setPet(p.name);
+                      setShowPetDropdown(false);
+                      setErrorMsg('');
+                    }}
                   >
                     <Text style={styles.optionText}>{p.name}</Text>
                   </TouchableOpacity>
@@ -161,12 +211,16 @@ export default function AddAppointment() {
               {reasonOptions.map(o => (
                 <TouchableOpacity
                   key={o}
-                  style={styles.option}
-                  onPress={() => { setReason(o); setShowReasonDropdown(false); }}
-                >
-                  <Text style={styles.optionText}>{o}</Text>
-                </TouchableOpacity>
-              ))}
+                    style={styles.option}
+                    onPress={() => {
+                      setReason(o);
+                      setShowReasonDropdown(false);
+                      setErrorMsg('');
+                    }}
+                  >
+                    <Text style={styles.optionText}>{o}</Text>
+                  </TouchableOpacity>
+                ))}
             </View>
           )}
         </View>
@@ -183,7 +237,7 @@ export default function AddAppointment() {
           value={extra}
         />
 
-        {/* Fecha como calendario */}
+        {/* Fecha */}
         <Text style={styles.label}>Fecha</Text>
         <View style={styles.calendarWrapper}>
           <TouchableOpacity
@@ -200,6 +254,7 @@ export default function AddAppointment() {
               onDayPress={day => {
                 setDate(day.dateString);
                 setShowDateCalendar(false);
+                setErrorMsg('');
               }}
               minDate={minDate}
               markedDates={date ? { [date]: { selected: true } } : {}}
@@ -227,13 +282,25 @@ export default function AddAppointment() {
           </TouchableOpacity>
           {showTimeDropdown && (
             <View style={styles.dropdown}>
-              {timeOptions.map(t => (
+              {filteredTimeOptions.map(({ time: t, disabled }) => (
                 <TouchableOpacity
                   key={t}
                   style={styles.option}
-                  onPress={() => { setTime(t); setShowTimeDropdown(false); }}
+                  disabled={disabled}
+                  onPress={() => {
+                    setTime(t);
+                    setShowTimeDropdown(false);
+                    setErrorMsg('');
+                  }}
                 >
-                  <Text style={styles.optionText}>{t}</Text>
+                  <Text
+                    style={[
+                      styles.optionText,
+                      disabled && styles.optionDisabledText
+                    ]}
+                  >
+                    {t}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -266,7 +333,3 @@ export default function AddAppointment() {
     </KeyboardAvoidingView>
   );
 }
-function addDate(arg0: { petId: string; reason: string; notes: string; date: string; time: string; }) {
-  throw new Error('Function not implemented.');
-}
-
