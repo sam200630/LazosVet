@@ -21,6 +21,7 @@ import { AuthContext } from './AuthContext';
 export interface Pet {
   id: string;
   name: string;
+  animalType: string;
   breed: string;
   gender: string;
   age: number;
@@ -68,6 +69,7 @@ export const PetsProvider: React.FC<{ children: React.ReactNode }> = ({
         return {
           id: d.id,
           name: data.name,
+          animalType: data.animalType,
           breed: data.breed,
           gender: data.gender,
           age: data.age,
@@ -93,6 +95,7 @@ export const PetsProvider: React.FC<{ children: React.ReactNode }> = ({
     const docRef = await addDoc(collection(db, 'pets'), {
       userId: user.uid,
       name: petData.name,
+      animalType: petData.animalType,
       breed: petData.breed,
       gender: petData.gender,
       age: petData.age,

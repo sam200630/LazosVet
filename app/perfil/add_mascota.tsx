@@ -54,6 +54,7 @@ export default function AddMascota() {
   const handleSubmit = async () => {
     await addPet({
       name,
+      animalType: '', // TODO: set the correct animal type value
       breed,
       gender,
       age: parseInt(age, 10),
