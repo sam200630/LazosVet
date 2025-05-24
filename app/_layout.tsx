@@ -8,6 +8,8 @@ import { ProfileProvider } from '../context/ProfileContext';
 import { PetsProvider } from '../context/PetsContext';
 import { DatesProvider } from '../context/DatesContext';
 import { PetBotProvider } from '../context/PetBotContext';
+import { MediaProvider } from '../context/MediaContext';
+
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     'Poppins-Black':                require('../assets/fonts/Poppins/Poppins-Black.ttf'),
@@ -44,9 +46,9 @@ export default function RootLayout() {
           <PetsProvider>
             <DatesProvider>
               <PetBotProvider>
-
-          
-                <Stack screenOptions={{ headerShown: false }} />
+                <MediaProvider>
+                  <Stack screenOptions={{ headerShown: false }} />
+                </MediaProvider> 
               </PetBotProvider>
             </DatesProvider>
           </PetsProvider>  
