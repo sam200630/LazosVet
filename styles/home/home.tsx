@@ -37,7 +37,7 @@ export default StyleSheet.create({
   },
   bannerImage: {
     width: '100%',
-    height: 160,
+    height: undefined,      // altura automática
     borderRadius: 12,
   },
   navButton: {
@@ -51,6 +51,27 @@ export default StyleSheet.create({
   },
   navRight: {
     right: 0,
+  },
+
+  // Indicadores del carrusel
+  dots: {
+    position: 'absolute',
+    bottom: 8,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#DDD',
+    marginHorizontal: 4,
+  },
+  dotActive: {
+    width: 12,
+    height: 12,
+    backgroundColor: '#A15E49',
   },
 
   sectionTitle: {
@@ -96,7 +117,7 @@ export default StyleSheet.create({
     tintColor: '#FFFFFF',
   },
 
-  // Cita card
+  // Tarjeta de cita
   card: {
     backgroundColor: '#F2E8E2',
     marginHorizontal: 16,
@@ -120,7 +141,6 @@ export default StyleSheet.create({
     color: '#101419',
   },
 
-  // Fila de fecha y botón detalles
   cardDateRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -133,7 +153,6 @@ export default StyleSheet.create({
     color: '#101419',
   },
 
-  // Botón ver detalles
   detailButton: {
     borderWidth: 1,
     borderColor: '#101419',
@@ -141,6 +160,7 @@ export default StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 6,
     paddingHorizontal: 12,
+    marginLeft: 8,
   },
   detailButtonText: {
     fontSize: 12,
@@ -167,7 +187,7 @@ export default StyleSheet.create({
     color: '#000000',
   },
 
-  // Bottom Tabs
+  // Tab bar
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',

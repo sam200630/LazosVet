@@ -1,9 +1,4 @@
-import React, {
-  useContext,
-  useState,
-  useEffect,
-  useRef
-} from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -42,7 +37,7 @@ export default function Home() {
   const router = useRouter();
   const { width } = useWindowDimensions();
 
-  // Enable LayoutAnimation on Android if needed
+  // LayoutAnimation en Android
   useEffect(() => {
     if (Platform.OS === 'android') {
       UIManager.setLayoutAnimationEnabledExperimental?.(true);
@@ -62,9 +57,9 @@ export default function Home() {
         )[0]
       : null;
 
-  // --- Carrusel Animado ---
+  // Carrusel animado
   const [bannerIndex, setBannerIndex] = useState(0);
-  const [direction, setDirection] = useState<'next' | 'prev'>('next');
+  const [direction, setDirection]     = useState<'next'|'prev'>('next');
   const slideAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -93,7 +88,11 @@ export default function Home() {
     setBannerIndex(i => (i + 1) % bannerImages.length);
   };
 
-  // --- Citas Expandibles Animadas ---
+  // Extraer proporción de la imagen actual
+  const { width: imgW, height: imgH } = Image.resolveAssetSource(bannerImages[bannerIndex]);
+  const aspectRatio = imgW / imgH;
+
+  // Citas expandibles
   const [expanded, setExpanded] = useState(false);
   const [allDates, setAllDates] = useState<DateType[]>([]);
   const expandAnim = useRef(new Animated.Value(0)).current;
@@ -111,11 +110,11 @@ export default function Home() {
     setExpanded(e => !e);
   };
 
-  // Tabs Inferior
+  // Tabs inferiores
   const tabs = [
-    { icon: homeIcon,   label: 'Home',    route: Routes.Home },
+    { icon: homeIcon,   label: 'Home',    route: Routes.Home   },
     { icon: petbotIcon, label: 'Pet bot', route: Routes.Petbot },
-    { icon: mediaIcon,  label: 'Media',   route: Routes.Media },
+    { icon: mediaIcon,  label: 'Media',   route: Routes.Media  },
     { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil },
   ];
 
@@ -135,12 +134,20 @@ export default function Home() {
           <Animated.View style={{ transform: [{ translateX: slideAnim }] }}>
             <Image
               source={bannerImages[bannerIndex]}
-              style={styles.bannerImage}
+              style={[styles.bannerImage, { aspectRatio }]}
               resizeMode="cover"
             />
           </Animated.View>
           <TouchableOpacity style={[styles.navButton, styles.navLeft]} onPress={prevBanner} />
           <TouchableOpacity style={[styles.navButton, styles.navRight]} onPress={nextBanner} />
+          <View style={styles.dots}>
+            {bannerImages.map((_, i) => (
+              <View
+                key={i}
+                style={[styles.dot, i === bannerIndex && styles.dotActive]}
+              />
+            ))}
+          </View>
         </View>
 
         {/* Mis mascotas */}
@@ -177,15 +184,12 @@ export default function Home() {
           <ActivityIndicator style={{ marginVertical: 16 }} size="small" color="#30C5FF" />
         ) : nextDate ? (
           <View style={styles.card}>
-            {/* Cita Principal */}
             <View style={styles.cardHeader}>
               <Image source={calendarioIcon} style={styles.cardIcon} />
               <Text style={styles.cardTitle}>
                 {`${nextDate.reason} ${nextDate.petName}`}
               </Text>
             </View>
-            
-            
             <View style={styles.cardDateRow}>
               <Text style={styles.cardDate}>
                 {`${nextDate.date}, ${nextDate.time}`}
@@ -210,8 +214,6 @@ export default function Home() {
               </View>
             </View>
 
-
-            {/* Lista Expandible */}
             <Animated.View
               style={{
                 height: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 200] }),
@@ -219,7 +221,7 @@ export default function Home() {
                 overflow: 'hidden',
               }}
             >
-              <ScrollView showsVerticalScrollIndicator style={{ marginTop: 12 }}>
+              <ScrollView style={{ marginTop: 12 }}>
                 {allDates.map(cita => (
                   <View key={cita.id} style={{ marginBottom: 12 }}>
                     <View style={styles.cardHeader}>
@@ -228,36 +230,24 @@ export default function Home() {
                         {`${cita.reason} ${cita.petName}`}
                       </Text>
                     </View>
-                    
                     <View style={styles.cardDateRow}>
-                  <Text style={styles.cardDate}>
-                    {`${cita.date}, ${cita.time}`}
-                  </Text>
-                  <View style={{ flexDirection: 'row', marginInline: 8 }}>
-                    <TouchableOpacity
-                      style={styles.detailButton}
-                      onPress={() =>
-                        router.push(`${Routes.DetallesCita}?id=${cita.id}`)
-                      }
-                    >
-                      <Text style={styles.detailButtonText}>Detalles</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.detailButton}
-                      onPress={() =>
-                        router.push(`${Routes.QR}?id=${cita.id}`)
-                      }
-                    >
-                      <Text style={styles.detailButtonText}>Ver QR</Text>
-                    </TouchableOpacity>
+                      <Text style={styles.cardDate}>
+                        {`${cita.date}, ${cita.time}`}
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.detailButton}
+                        onPress={() =>
+                          router.push(`${Routes.DetallesCita}?id=${cita.id}`)
+                        }
+                      >
+                        <Text style={styles.detailButtonText}>Detalles</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-              </View>
-            ))}
+                ))}
               </ScrollView>
             </Animated.View>
 
-            {/* Botones de acción */}
             <View style={styles.cardButtons}>
               <TouchableOpacity
                 style={styles.cardButton}
@@ -287,7 +277,7 @@ export default function Home() {
         )}
       </ScrollView>
 
-      {/* Bottom Tabs */}
+      {/* Tabs inferiores */}
       <View style={styles.tabBar}>
         {tabs.map((tab, i) => (
           <TouchableOpacity

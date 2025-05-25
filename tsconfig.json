@@ -7,5 +7,5 @@
     "declarations.d.ts",
     "app/**/*",
     "styles/**/*"
-  ]
+, "app/admin/.tsx"  ]
 }

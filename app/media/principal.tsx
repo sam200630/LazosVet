@@ -29,10 +29,10 @@ export default function MediaPrincipal() {
   const [tab, setTab] = useState<'publicaciones' | 'preguntas'>('publicaciones');
 
   const tabsBottom = [
-    { icon: homeIcon,   route: Routes.Home,   label: 'Home'   },
-    { icon: petbotIcon, route: Routes.Petbot,   label: 'Pet bot'},
-    { icon: mediaIcon,  route: Routes.Media,  label: 'Media'  },
-    { icon: perfilIcon, route: Routes.Perfil, label: 'Perfil' },
+    { icon: homeIcon,   route: Routes.Home,    label: 'Home'    },
+    { icon: petbotIcon, route: Routes.Petbot,  label: 'Pet bot' },
+    { icon: mediaIcon,  route: Routes.Media,   label: 'Media'   },
+    { icon: perfilIcon, route: Routes.Perfil,  label: 'Perfil'  },
   ];
 
   return (
@@ -40,7 +40,7 @@ export default function MediaPrincipal() {
       {/* Header con lupa a la izquierda, selector en el centro y + a la derecha */}
       <View style={styles.header}>
         {/* lupa a la izquierda */}
-        <TouchableOpacity onPress={() => {/* acción búsqueda */}}>
+        <TouchableOpacity onPress={() => {/* TODO: acción búsqueda */}}>
           <Image source={lupaIcon} style={styles.icon} />
         </TouchableOpacity>
 
@@ -81,7 +81,7 @@ export default function MediaPrincipal() {
         </View>
 
         {/* + a la derecha */}
-         <TouchableOpacity onPress={() => {/* acción búsqueda */}}>
+        <TouchableOpacity onPress={() => router.push(Routes.add)}>
           <Image source={plusIcon} style={styles.icon} />
         </TouchableOpacity>
       </View>
@@ -124,5 +124,5 @@ export default function MediaPrincipal() {
         ))}
       </View>
     </SafeAreaView>
-);
+  );
 }

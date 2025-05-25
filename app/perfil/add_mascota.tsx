@@ -17,34 +17,38 @@ import { CameraModal } from '../../components/CameraModal';
 import { PetsContext } from '../../context/PetsContext';
 
 // íconos...
-import goBackIcon from '../../assets/images/goBack.png';
-import homeIcon from '../../assets/images/home.png';
-import petbotIcon from '../../assets/images/petbot.png';
-import mediaIcon from '../../assets/images/media.png';
-import perfilIcon from '../../assets/images/perfil.png';
-import expanderIcon from '../../assets/images/expander.png';
+import goBackIcon    from '../../assets/images/goBack.png';
+import homeIcon      from '../../assets/images/home.png';
+import petbotIcon    from '../../assets/images/petbot.png';
+import mediaIcon     from '../../assets/images/media.png';
+import perfilIcon    from '../../assets/images/perfil.png';
+import expanderIcon  from '../../assets/images/expander.png';
 
 export default function AddMascota() {
   const router = useRouter();
   const { addPet } = useContext(PetsContext);
 
   // Form state
-  const [name, setName] = useState('');
-  const [breed, setBreed] = useState('');
-  const [gender, setGender] = useState('');
+  const [name, setName]       = useState('');
+  const [breed, setBreed]     = useState('');
+  const [species, setSpecies] = useState('');                   // ← nuevo
+  const [showSpeciesDropdown, setShowSpeciesDropdown] = useState(false);
+  const [gender, setGender]   = useState('');
   const [showGenderDropdown, setShowGenderDropdown] = useState(false);
-  const [age, setAge] = useState('');
+  const [age, setAge]         = useState('');
   const [ageUnit, setAgeUnit] = useState<'Años' | 'Meses'>('Años');
   const [showUnits, setShowUnits] = useState(false);
-  const [weight, setWeight] = useState('');
-  const [conds, setConds] = useState('');
+  const [weight, setWeight]   = useState('');
+  const [conds, setConds]     = useState('');
 
   // Photo
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [photoUri, setPhotoUri]       = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const genderOptions = ['Macho', 'Hembra'];
-  const isValid = !!(name && breed && gender && age && weight);
+  const speciesOptions = ['Perro', 'Gato'];                     // ← nuevo
+  const genderOptions  = ['Macho', 'Hembra'];
+
+  const isValid = !!(name && breed && species && gender && age && weight);
 
   const handleAgeChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) =>
     setAge(e.nativeEvent.text.replace(/\D/g, '').slice(0, 3));
@@ -67,10 +71,10 @@ export default function AddMascota() {
   };
 
   const tabs = [
-    { icon: homeIcon, label: 'Home', route: Routes.Home },
+    { icon: homeIcon,   label: 'Home',    route: Routes.Home },
     { icon: petbotIcon, label: 'Pet bot', route: Routes.Petbot },
-    { icon: mediaIcon, label: 'Media', route: Routes.Media },
-    { icon: perfilIcon, label: 'Perfil', route: Routes.Perfil },
+    { icon: mediaIcon,  label: 'Media',   route: Routes.Media },
+    { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil },
   ];
 
   return (
@@ -130,6 +134,36 @@ export default function AddMascota() {
             value={breed}
             onChangeText={setBreed}
           />
+
+          {/* Especie */}
+          <Text style={styles.label}>Especie</Text>
+          <View style={styles.selectorWrapper}>
+            <TouchableOpacity
+              style={styles.selectorContainer}
+              onPress={() => setShowSpeciesDropdown(v => !v)}
+            >
+              <Text style={species ? styles.selectorText : styles.selectorPlaceholder}>
+                {species || 'Selecciona especie'}
+              </Text>
+              <Image source={expanderIcon} style={styles.expanderIcon} />
+            </TouchableOpacity>
+            {showSpeciesDropdown && (
+              <View style={styles.dropdown}>
+                {speciesOptions.map(opt => (
+                  <TouchableOpacity
+                    key={opt}
+                    style={styles.option}
+                    onPress={() => {
+                      setSpecies(opt);
+                      setShowSpeciesDropdown(false);
+                    }}
+                  >
+                    <Text style={styles.optionText}>{opt}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </View>
 
           {/* Género */}
           <Text style={styles.label}>Género</Text>

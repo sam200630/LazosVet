@@ -1,4 +1,5 @@
-// app/chat.tsx
+// app/petBot/chat.tsx
+
 import React, { useState, useContext, useEffect } from 'react';
 import {
   SafeAreaView,
@@ -17,6 +18,7 @@ import { Routes } from '../../route';
 
 // Iconos
 import petbotIcon from '../../assets/images/petbot.png';
+import pawIcon    from '../../assets/images/huellaGrande.png';
 import addIcon    from '../../assets/images/+.png';
 import sendIcon   from '../../assets/images/send.png';
 import homeIcon   from '../../assets/images/home.png';
@@ -37,31 +39,43 @@ export default function Chat() {
     sendMessage,
     getChats,
     getMessages,
-    isLoading,
+    isLoading: botLoading,
   } = useContext(PetBotContext);
 
   const [query, setQuery] = useState<string>('');
+  const [sending, setSending] = useState(false);
 
-  // Al montar, carga la lista de chats y mensajes del primero (opcional)
   useEffect(() => {
     (async () => {
       await getChats(userId);
-      // Si solo tienes un chat “PetBot” fijo:
       await getMessages(userId, 'PetBot');
     })();
   }, [userId]);
 
-  const handleSend = () => {
-    if (!query.trim()) return;
-    sendMessage(userId, query.trim());
+  const handleSend = async () => {
+    if (!query.trim() || botLoading) return;
+    setSending(true);
+    await sendMessage(userId, query.trim());
     setQuery('');
+    setSending(false);
+  };
+
+  const renderFormatted = (text: string) => {
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, i) => {
+      if (/^\*\*.*\*\*$/.test(part)) {
+        const content = part.slice(2, -2);
+        return <Text key={i} style={{ fontWeight: 'bold' }}>{content}</Text>;
+      }
+      return <Text key={i}>{part}</Text>;
+    });
   };
 
   const tabs = [
-    { icon: homeIcon,   label: 'Home',    route: Routes.Home       },
-    { icon: petbotIcon, label: 'Pet bot', route: 'petbot/chat'      },
-    { icon: mediaIcon,  label: 'Media',   route: Routes.Media      },
-    { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil     },
+    { icon: homeIcon,   route: Routes.Home   },
+    { icon: petbotIcon, route: Routes.Petbot },
+    { icon: mediaIcon,  route: Routes.Media  },
+    { icon: perfilIcon, route: Routes.Perfil },
   ];
 
   return (
@@ -77,20 +91,43 @@ export default function Chat() {
         style={[styles.messagesContainer, { maxHeight: height * 0.65 }]}
         contentContainerStyle={styles.messagesContent}
       >
-        {messages.length === 0 ? (
-          <Text style={styles.placeholderText}>
-            Aquí verás la conversación...
-          </Text>
-        ) : (
-          messages.map((m, i) => (
-            <View key={i} style={styles.bubble}>
-              <Text style={styles.bubbleText}>{m.text}</Text>
-              <Text style={styles.bubbleText}>
-                {new Date(m.timestamp).toLocaleTimeString()}
-              </Text>
-            </View>
-          ))
-        )}
+        {messages.length === 0
+          ? <Text style={styles.placeholderText}>Aquí verás la conversación...</Text>
+          : messages.map((m, i) => {
+              const isUser = m.sender !== 'bot';
+              return (
+                <View
+                  key={i}
+                  style={[
+                    styles.bubbleRow,
+                    isUser ? styles.bubbleUserRow : styles.bubbleBotRow
+                  ]}
+                >
+                  {isUser && <Image source={pawIcon} style={styles.userAvatar} />}
+                  <View style={[
+                    styles.bubble,
+                    isUser ? styles.bubbleUser : styles.bubbleBot
+                  ]}>
+                    <View style={styles.bubbleContent}>
+                      {renderFormatted(m.text).map((node, idx) => (
+                        <React.Fragment key={idx}>{node}</React.Fragment>
+                      ))}
+                    </View>
+                    <Text style={[
+                      styles.bubbleMeta,
+                      isUser ? styles.bubbleMetaUser : styles.bubbleMetaBot
+                    ]}>
+                      {isUser
+                        ? new Date(m.timestamp).toLocaleTimeString()
+                        : `PetBot · ${new Date(m.timestamp).toLocaleTimeString()}`
+                      }
+                    </Text>
+                  </View>
+                  {!isUser && <View style={{ width: 32 }} />}
+                </View>
+              );
+            })
+        }
       </ScrollView>
 
       {/* Input */}
@@ -104,13 +141,15 @@ export default function Chat() {
           placeholderTextColor="#999"
           value={query}
           onChangeText={setQuery}
+          editable={!botLoading}
+          onSubmitEditing={handleSend}
         />
         <TouchableOpacity
           style={styles.iconButton}
           onPress={handleSend}
-          disabled={isLoading}
+          disabled={botLoading || sending}
         >
-          {isLoading
+          {botLoading || sending
             ? <ActivityIndicator />
             : <Image source={sendIcon} style={styles.icon} />
           }
@@ -119,14 +158,13 @@ export default function Chat() {
 
       {/* Bottom Tabs */}
       <View style={styles.tabBar}>
-        {tabs.map((tab, i) => (
+        {tabs.map((t, i) => (
           <TouchableOpacity
             key={i}
             style={styles.tabItem}
-            onPress={() => router.replace(tab.route)}
+            onPress={() => router.replace(t.route)}
           >
-            <Image source={tab.icon} style={styles.tabIcon} />
-            <Text style={styles.tabLabel}>{tab.label}</Text>
+            <Image source={t.icon} style={styles.tabIcon} />
           </TouchableOpacity>
         ))}
       </View>
