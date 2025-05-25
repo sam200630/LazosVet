@@ -11,13 +11,12 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import styles from '../../../styles/citas/detalles';
 import { DatesContext, DateType } from '../../../context/DatesContext';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../../utils/FirebaseConfig';
 
 // Assets
 import goBackIcon from '../../../assets/images/goBack.png';
 import pawIcon    from '../../../assets/images/mascota.png';
-import { Route } from 'expo-router/build/Route';
 import { Routes } from '../../../route';
 
 export default function DetallesCita() {
@@ -28,10 +27,29 @@ export default function DetallesCita() {
   const { dates } = useContext(DatesContext);
   const [cita, setCita] = useState<DateType | null>(null);
 
-  useEffect(() => {
-    const found = dates.find(d => d.id === id) || null;
+ useEffect(() => {
+  const found = dates.find(d => d.id === id) || null;
+  if (found) {
     setCita(found);
-  }, [id, dates]);
+  } else {
+    // Si no se encuentra localmente, cargar desde Firestore
+    (async () => {
+      try {
+        const snap = await getDoc(doc(db, 'dates', id));
+        if (snap.exists()) {
+          const data = snap.data();
+          setCita({ id: snap.id, ...data } as DateType);
+        } else {
+          setCita(null);
+        }
+      } catch (e) {
+        console.error(e);
+        setCita(null);
+      }
+    })();
+  }
+}, [id, dates]);
+
 
   const handleConfirm = () => {
     router.replace(Routes.Home);

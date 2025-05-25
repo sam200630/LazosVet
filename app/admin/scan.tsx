@@ -23,7 +23,7 @@ export default function AdminScan() {
     if (scanned) return;
     setScanned(true);
     // data debería ser el ID de la cita
-    router.replace(`/admin/detalles-cita?id=${data}`);
+    router.replace(`/admin/detallesCitaQRid=${data}`);
   };
 
   if (hasPermission === null) {
