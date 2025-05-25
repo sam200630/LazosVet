@@ -20,6 +20,7 @@ import { PetsContext, Pet } from '../../../context/PetsContext';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, db } from '../../../utils/FirebaseConfig';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import BottomTabs from '../../../components/bottonsTab';
 
 import goBackIcon   from '../../../assets/images/goBack.png';
 import personaIcon  from '../../../assets/images/persona.png';
@@ -190,20 +191,7 @@ export default function Perfil() {
       </ScrollView>
 
       {/* Tab bar */}
-      <View style={styles.tabBar}>
-        {[ homeIcon, petbotIcon, mediaIcon, perfilIcon ].map((icon, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.tabItem}
-            onPress={() => {
-              const routes = [Routes.Home, Routes.Petbot, Routes.Media, Routes.Perfil];
-              router.replace(routes[i]);
-            }}
-          >
-            <Image source={icon} style={styles.tabIcon} />
-          </TouchableOpacity>
-        ))}
-      </View>
+      <BottomTabs />
     </SafeAreaView>
   );
 }

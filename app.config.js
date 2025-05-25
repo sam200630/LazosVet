@@ -10,30 +10,42 @@ export default {
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
     newArchEnabled: true,
+
     splash: {
-      image: './assets/splash-icon.png',
+      image: './assets/splash.png',
       resizeMode: 'contain',
       backgroundColor: '#ffffff',
     },
+
     ios: {
       supportsTablet: true,
+      bundleIdentifier: 'com.andreysamu.lazosvet', // ← ¡Modifica con tu ID único!
     },
+
     android: {
+      package: 'com.andreysamu.lazosvet', // ← ¡Mismo aquí!
       adaptiveIcon: {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#ffffff',
       },
       edgeToEdgeEnabled: true,
     },
+
     web: {
       favicon: './assets/favicon.png',
     },
+
     plugins: [
       'expo-font',
+      'expo-barcode-scanner',
+      'expo-dev-client', // ← Necesario para builds con EAS Dev Client
     ],
+
     extra: {
-      // Aquí inyectamos tu clave de Gemini desde .env
       GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+      eas: {
+        projectId: '5f783341-dc3b-46b5-a825-7723c610f719',
+      },
     },
   },
 };

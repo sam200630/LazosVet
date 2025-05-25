@@ -21,7 +21,7 @@ export default function BottomTabs() {
     if (userType === 'admin') {
       return [
         { icon: homeIcon,   label: 'Home',     route: Routes.AdminHome},
-        { icon: scanIcon,   label: 'Escanear', route: Routes.AdminHome },
+        { icon: scanIcon,   label: 'Escanear', route: Routes.AdminScanner },
         { icon: mediaIcon,  label: 'Media',    route: Routes.Media },
         { icon: perfilIcon, label: 'Perfil',   route: Routes.Perfil },
       ];

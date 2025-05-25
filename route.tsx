@@ -19,7 +19,7 @@ export const Routes = {
   // =====================
   AdminHome: '/admin/home',
   AdminAddCita: '/admin/add-cita',
-  AdminScanner: '/admin/qr',
+  AdminScanner: '/admin/scan',
 
   // =====================
   // 🔁 Rutas compartidas

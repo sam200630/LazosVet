@@ -15,6 +15,8 @@ import {
   orderBy,
   serverTimestamp,
   DocumentData,
+  getDoc,
+  doc as docRef,
 } from 'firebase/firestore';
 import {
   ref as storageRef,
@@ -25,6 +27,8 @@ import {
 export interface MediaPost {
   id: string;
   userId: string;
+  userName: string;
+  userPhoto: string | null;
   imageUrl: string;
   description: string;
   createdAt: Date;
@@ -33,12 +37,6 @@ export interface MediaPost {
 interface MediaContextType {
   posts: MediaPost[];
   loading: boolean;
-  /**
-   * Crea una nueva publicación:
-   * - sube la imagen que recibe como URI local
-   * - obtiene su URL pública
-   * - añade un doc en Firestore en la colección "media"
-   */
   addPost: (
     userId: string,
     imageUri: string,
@@ -58,60 +56,57 @@ export const MediaProvider: React.FC<{ children: ReactNode }> = ({
   const [posts, setPosts] = useState<MediaPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // ⏳ Suscripción en tiempo real al feed de "media", ordenado por fecha descendente
   useEffect(() => {
     const q = query(
       collection(db, 'media'),
       orderBy('createdAt', 'desc')
     );
-    const unsub = onSnapshot(q, snapshot => {
-      const arr: MediaPost[] = snapshot.docs.map(doc => {
-        const data = doc.data() as DocumentData;
-        return {
-          id: doc.id,
-          userId: data.userId,
-          imageUrl: data.imageUrl,
-          description: data.description,
-          createdAt: data.createdAt.toDate(),
-        };
-      });
+    const unsub = onSnapshot(q, async snapshot => {
+      // Por cada doc de media, traemos también su user
+      const arr: MediaPost[] = await Promise.all(
+        snapshot.docs.map(async docSnap => {
+          const data = docSnap.data() as DocumentData;
+          // fetch user
+          const userSnap = await getDoc(docRef(db, 'users', data.userId));
+          const userData = userSnap.exists() ? userSnap.data() : {};
+          return {
+            id: docSnap.id,
+            userId: data.userId,
+            userName: (userData.name as string) || 'unknown',
+            userPhoto: (userData.photoUrl as string) || null,
+            imageUrl: data.imageUrl,
+            description: data.description,
+            createdAt: data.createdAt.toDate(),
+          };
+        })
+      );
       setPosts(arr);
       setLoading(false);
     });
-
     return () => unsub();
   }, []);
 
-  // 📤 Función para crear una publicación
   const addPost = async (
     userId: string,
     imageUri: string,
     description: string
   ) => {
     setLoading(true);
-
-    // 1️⃣ Subir la imagen a Storage
-    // Ruta: media/<userId>/<timestamp>.jpg
+    // 1️⃣ subir imagen
     const filename = `${userId}/${Date.now()}.jpg`;
-    const imageRef = storageRef(storage, `media/${filename}`);
-
-    // fetch→blob para convertir URI local en blob
+    const imgRef = storageRef(storage, `media/${filename}`);
     const resp = await fetch(imageUri);
     const blob = await resp.blob();
-
-    await uploadBytes(imageRef, blob);
-
-    // 2️⃣ Obtener URL pública
-    const url = await getDownloadURL(imageRef);
-
-    // 3️⃣ Guardar documento en Firestore
+    await uploadBytes(imgRef, blob);
+    // 2️⃣ obtener URL
+    const url = await getDownloadURL(imgRef);
+    // 3️⃣ guardar en Firestore
     await addDoc(collection(db, 'media'), {
       userId,
       imageUrl: url,
       description,
       createdAt: serverTimestamp(),
     });
-
     setLoading(false);
   };
 
