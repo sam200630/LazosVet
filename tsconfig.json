@@ -6,6 +6,8 @@
   "include": [
     "declarations.d.ts",
     "app/**/*",
+    "components/**/*",
+    "context/**/*",
     "styles/**/*"
-, "app/admin/.tsx"  ]
+  ]
 }

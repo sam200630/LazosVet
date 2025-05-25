@@ -11,18 +11,19 @@ import {
   TextInputChangeEventData,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import styles, { TAB_BAR_HEIGHT } from '../../styles/perfil/add_mascota';
-import { Routes } from '../../route';
-import { CameraModal } from '../../components/CameraModal';
-import { PetsContext } from '../../context/PetsContext';
+import styles, { TAB_BAR_HEIGHT } from '../../../styles/perfil/add_mascota';
+import { Routes } from '../../../route';
+import { CameraModal } from '../../../components/CameraModal';
+import { PetsContext } from '../../../context/PetsContext';
+import BottomTabs from '../../../components/bottonsTab';
 
 // íconos...
-import goBackIcon    from '../../assets/images/goBack.png';
-import homeIcon      from '../../assets/images/home.png';
-import petbotIcon    from '../../assets/images/petbot.png';
-import mediaIcon     from '../../assets/images/media.png';
-import perfilIcon    from '../../assets/images/perfil.png';
-import expanderIcon  from '../../assets/images/expander.png';
+import goBackIcon    from '../../../assets/images/goBack.png';
+import homeIcon      from '../../../assets/images/home.png';
+import petbotIcon    from '../../../assets/images/petbot.png';
+import mediaIcon     from '../../../assets/images/media.png';
+import perfilIcon    from '../../../assets/images/perfil.png';
+import expanderIcon  from '../../../assets/images/expander.png';
 
 export default function AddMascota() {
   const router = useRouter();
@@ -269,18 +270,7 @@ export default function AddMascota() {
       </ScrollView>
 
       {/* Tab bar */}
-      <View style={styles.tabBar}>
-        {tabs.map((tab, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.tabItem}
-            onPress={() => router.replace(tab.route)}
-          >
-            <Image source={tab.icon} style={styles.tabIcon} />
-            <Text style={styles.tabLabel}>{tab.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <BottomTabs />
     </SafeAreaView>
   );
 }

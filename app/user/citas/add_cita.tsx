@@ -13,19 +13,20 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Routes } from '../../route';
-import styles from '../../styles/citas/add_cita';
-import { PetsContext } from '../../context/PetsContext';  
-import { DatesContext } from '../../context/DatesContext'; 
+import { Routes } from '../../../route';
+import styles from '../../../styles/citas/add_cita';
+import { PetsContext } from '../../../context/PetsContext';  
+import { DatesContext } from '../../../context/DatesContext'; 
+import BottomTabs from '../../../components/bottonsTab';
 
 // Imports estáticos
-import goBackIcon   from '../../assets/images/goBack.png';
-import pawIcon      from '../../assets/images/huellaGrande.png';
-import homeIcon     from '../../assets/images/home.png';
-import petbotIcon   from '../../assets/images/petbot.png';
-import mediaIcon    from '../../assets/images/media.png';
-import perfilIcon   from '../../assets/images/perfil.png';
-import expanderIcon from '../../assets/images/expander.png';
+import goBackIcon   from '../../../assets/images/goBack.png';
+import pawIcon      from '../../../assets/images/huellaGrande.png';
+import homeIcon     from '../../../assets/images/home.png';
+import petbotIcon   from '../../../assets/images/petbot.png';
+import mediaIcon    from '../../../assets/images/media.png';
+import perfilIcon   from '../../../assets/images/perfil.png';
+import expanderIcon from '../../../assets/images/expander.png';
 
 // Calendario
 import { Calendar } from 'react-native-calendars';
@@ -329,18 +330,7 @@ export default function AddAppointment() {
       </ScrollView>
 
       {/* Bottom Tabs */}
-      <View style={styles.tabBar}>
-        {tabs.map((tab, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.tabItem}
-            onPress={() => router.replace(tab.route)}
-          >
-            <Image source={tab.icon} style={styles.tabIcon} />
-            <Text style={styles.tabLabel}>{tab.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <BottomTabs />
     </KeyboardAvoidingView>
   );
 }

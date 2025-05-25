@@ -12,26 +12,26 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import styles from '../../styles/perfil/perfil';
-import { CameraModal } from '../../components/CameraModal';
-import { AuthContext } from '../../context/AuthContext';
-import { ProfileContext } from '../../context/ProfileContext';
-import { PetsContext, Pet } from '../../context/PetsContext';
+import styles from '../../../styles/perfil/perfil';
+import { CameraModal } from '../../../components/CameraModal';
+import { AuthContext } from '../../../context/AuthContext';
+import { ProfileContext } from '../../../context/ProfileContext';
+import { PetsContext, Pet } from '../../../context/PetsContext';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { auth, db } from '../../utils/FirebaseConfig';
+import { auth, db } from '../../../utils/FirebaseConfig';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
-import goBackIcon   from '../../assets/images/goBack.png';
-import personaIcon  from '../../assets/images/persona.png';
-import correoIcon   from '../../assets/images/correo.png';
-import pawSmallIcon from '../../assets/images/mascota.png';
-import editIcon     from '../../assets/images/editar.png';
-import trashIcon    from '../../assets/images/basura.png';
-import homeIcon     from '../../assets/images/home.png';
-import petbotIcon   from '../../assets/images/petbot.png';
-import mediaIcon    from '../../assets/images/media.png';
-import perfilIcon   from '../../assets/images/perfil.png';
-import { Routes } from '../../route';
+import goBackIcon   from '../../../assets/images/goBack.png';
+import personaIcon  from '../../../assets/images/persona.png';
+import correoIcon   from '../../../assets/images/correo.png';
+import pawSmallIcon from '../../../assets/images/mascota.png';
+import editIcon     from '../../../assets/images/editar.png';
+import trashIcon    from '../../../assets/images/basura.png';
+import homeIcon     from '../../../assets/images/home.png';
+import petbotIcon   from '../../../assets/images/petbot.png';
+import mediaIcon    from '../../../assets/images/media.png';
+import perfilIcon   from '../../../assets/images/perfil.png';
+import { Routes } from '../../../route';
 
 export default function Perfil() {
   const router = useRouter();
@@ -134,7 +134,7 @@ export default function Perfil() {
           <Image
             source={ photoUrl
               ? { uri: photoUrl }
-              : require('../../assets/images/default-profile.jpeg')
+              : require('../../../assets/images/default-profile.jpeg')
             }
             style={styles.profilePic}
           />
@@ -164,7 +164,7 @@ export default function Perfil() {
 
                   {/* Editar mascota */}
                   <TouchableOpacity
-                    onPress={() => router.push(`${Routes.edit_mascota}?id=${p.id}`)}
+                    onPress={() => router.push(`${Routes.EditMascota}?id=${p.id}`)}
                   >
                     <Image source={editIcon} style={styles.editIcon} />
                   </TouchableOpacity>

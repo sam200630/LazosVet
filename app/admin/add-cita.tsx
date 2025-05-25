@@ -38,6 +38,7 @@ import expanderIcon from '../../assets/images/expander.png';
 
 // Calendario
 import { Calendar } from 'react-native-calendars';
+import BottomTabs from '../../components/bottonsTab';
 
 export default function AddAppointment() {
   const router = useRouter();
@@ -394,19 +395,8 @@ export default function AddAppointment() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Tabs inferiores */}
-      <View style={styles.tabBar}>
-        {tabs.map((tab, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.tabItem}
-            onPress={() => router.replace(tab.route)}
-          >
-            <Image source={tab.icon} style={styles.tabIcon} />
-            <Text style={styles.tabLabel}>{tab.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      {/* Bottom Tabs */}
+       <BottomTabs />
     </KeyboardAvoidingView>
   );
 }

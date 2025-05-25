@@ -1,8 +1,4 @@
-// ===============================================================
-// Archivo: context/AuthContext.tsx
-// Propósito: Proveer funciones y estado para la autenticación de usuarios,
-// incluyendo el login, logout y la asignación de roles al usuario.
-// ===============================================================
+
 
 import React, { createContext, useState, useEffect } from 'react';
 import { auth, db } from '../utils/FirebaseConfig';
@@ -23,6 +19,8 @@ export const AuthContext = createContext<any>(null);
 export const AuthProvider = ({ children }: any) => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [userType, setUserType] = useState<string>('');
+  const [authInitialized, setAuthInitialized] = useState(false);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -33,13 +31,20 @@ export const AuthProvider = ({ children }: any) => {
         const isAdmin = usr.email.includes('@admin');
         const role = isAdmin ? 'admin' : 'usuario';
         setUserType(role);
-        router.replace(Routes.Home);
+        if (role === 'admin') {
+          router.replace(Routes.AdminHome);
+        }
+        else {
+          router.replace(Routes.Home);
+        }
+        
       
       } else {
         setUserType('');
         router.replace(Routes.Login);
       }
     });
+    setAuthInitialized(true);
 
     return () => unsubscribe();
   }, []);
@@ -88,6 +93,7 @@ export const AuthProvider = ({ children }: any) => {
       value={{
         user,
         userType,
+        authInitialized,
         email: user?.email || '',
         login,
         register,

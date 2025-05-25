@@ -12,16 +12,16 @@ import {
   TextInput,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import styles from '../../styles/perfil/mascota';
-import { PetsContext, Pet } from '../../context/PetsContext';
-import { DatesContext } from '../../context/DatesContext';
-import { db } from '../../utils/FirebaseConfig';
+import styles from '../../../styles/perfil/mascota';
+import { PetsContext, Pet } from '../../../context/PetsContext';
+import { DatesContext } from '../../../context/DatesContext';
+import { db } from '../../../utils/FirebaseConfig';
 import { doc, updateDoc } from 'firebase/firestore';
 
-import goBackIcon   from '../../assets/images/goBack.png';
-import logoIcon     from '../../assets/images/logo.png';
-import editIcon     from '../../assets/images/editar.png';
-import calendarIcon from '../../assets/images/calendario.png';
+import goBackIcon   from '../../../assets/images/goBack.png';
+import logoIcon     from '../../../assets/images/logo.png';
+import editIcon     from '../../../assets/images/editar.png';
+import calendarIcon from '../../../assets/images/calendario.png';
 
 type Field = 'breed' | 'age' | 'weight' | 'conditions' | null;
 

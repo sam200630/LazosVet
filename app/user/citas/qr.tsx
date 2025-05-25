@@ -10,14 +10,14 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { BlurView } from 'expo-blur';
-import styles from '../../styles/citas/qr';
-import { Routes } from '../../route';
-import goBackIcon from '../../assets/images/goBack.png';
+import styles from '../../../styles/citas/qr';
+import { Routes } from '../../../route';
+import goBackIcon from '../../../assets/images/goBack.png';
 
 import QRCode from 'react-native-qrcode-svg';   // ← CAMBIO: importamos el componente QR
 import { doc, getDoc } from 'firebase/firestore'; // ← CAMBIO: para leer la cita
-import { db } from '../../utils/FirebaseConfig';
-import { DateType } from '../../context/DatesContext';
+import { db } from '../../../utils/FirebaseConfig';
+import { DateType } from '../../../context/DatesContext';
 
 export default function QR() {
   const router = useRouter();

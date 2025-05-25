@@ -1,6 +1,6 @@
 // app/media/principal.tsx
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -11,29 +11,29 @@ import {
   Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Routes } from '../../route';
-import styles from '../../styles/media/principal';
+import { Routes } from '../../../route';
+import { AuthContext } from '../../../context/AuthContext';
+import styles from '../../../styles/media/principal';
+import BottomTabs from '../../../components/bottonsTab';
 
 // Iconos estáticos
-import lupaIcon    from '../../assets/images/lupa.png';
-import plusIcon    from '../../assets/images/+.png';
-import likeIcon    from '../../assets/images/like.png';
-import commentIcon from '../../assets/images/coments.png';
-import homeIcon    from '../../assets/images/home.png';
-import petbotIcon  from '../../assets/images/petbot.png';
-import mediaIcon   from '../../assets/images/media.png';
-import perfilIcon  from '../../assets/images/perfil.png';
+import lupaIcon    from '../../../assets/images/lupa.png';
+import plusIcon    from '../../../assets/images/+.png';
+import likeIcon    from '../../../assets/images/like.png';
+import commentIcon from '../../../assets/images/coments.png';
+import homeIcon    from '../../../assets/images/home.png';
+import petbotIcon  from '../../../assets/images/petbot.png';
+import mediaIcon   from '../../../assets/images/media.png';
+import scanIcon    from '../../../assets/images/escanear.png'; 
+import perfilIcon  from '../../../assets/images/perfil.png';
 
 export default function MediaPrincipal() {
   const router = useRouter();
   const [tab, setTab] = useState<'publicaciones' | 'preguntas'>('publicaciones');
+  const { userType } = useContext(AuthContext); 
 
-  const tabsBottom = [
-    { icon: homeIcon,   route: Routes.Home,    label: 'Home'    },
-    { icon: petbotIcon, route: Routes.Petbot,  label: 'Pet bot' },
-    { icon: mediaIcon,  route: Routes.Media,   label: 'Media'   },
-    { icon: perfilIcon, route: Routes.Perfil,  label: 'Perfil'  },
-  ];
+  
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -81,7 +81,7 @@ export default function MediaPrincipal() {
         </View>
 
         {/* + a la derecha */}
-        <TouchableOpacity onPress={() => router.push(Routes.add)}>
+        <TouchableOpacity onPress={() => router.push(Routes.AddMedia)}>
           <Image source={plusIcon} style={styles.icon} />
         </TouchableOpacity>
       </View>
@@ -111,18 +111,7 @@ export default function MediaPrincipal() {
       </ScrollView>
 
       {/* Bottom Tabs */}
-      <View style={styles.tabBar}>
-        {tabsBottom.map((t, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.tabItem}
-            onPress={() => router.replace(t.route)}
-          >
-            <Image source={t.icon} style={styles.tabIcon} />
-            <Text style={styles.tabLabel}>{t.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <BottomTabs />
     </SafeAreaView>
   );
 }

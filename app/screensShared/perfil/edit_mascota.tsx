@@ -13,20 +13,20 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import styles, { TAB_BAR_HEIGHT } from '../../styles/perfil/edit_mascota';
-import { CameraModal } from '../../components/CameraModal';
-import { PetsContext, Pet } from '../../context/PetsContext';
+import styles, { TAB_BAR_HEIGHT } from '../../../styles/perfil/edit_mascota';
+import { CameraModal } from '../../../components/CameraModal';
+import { PetsContext, Pet } from '../../../context/PetsContext';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db, app } from '../../utils/FirebaseConfig';
+import { db, app } from '../../../utils/FirebaseConfig';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-import goBackIcon from '../../assets/images/goBack.png';
-import homeIcon   from '../../assets/images/home.png';
-import petbotIcon from '../../assets/images/petbot.png';
-import mediaIcon  from '../../assets/images/media.png';
-import perfilIcon from '../../assets/images/perfil.png';
-import expanderIcon from '../../assets/images/expander.png';
-import { Routes } from '../../route';
+import goBackIcon from '../../../assets/images/goBack.png';
+import homeIcon   from '../../../assets/images/home.png';
+import petbotIcon from '../../../assets/images/petbot.png';
+import mediaIcon  from '../../../assets/images/media.png';
+import perfilIcon from '../../../assets/images/perfil.png';
+import expanderIcon from '../../../assets/images/expander.png';
+import { Routes } from '../../../route';
 
 export default function EditMascota() {
   const router = useRouter();

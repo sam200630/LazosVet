@@ -13,21 +13,22 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import styles from '../../styles/petBot/chat';
-import { Routes } from '../../route';
+import styles from '../../../styles/petBot/chat';
+import { Routes } from '../../../route';
+import BottomTabs from '../../../components/bottonsTab';
 
 // Iconos
-import petbotIcon from '../../assets/images/petbot.png';
-import pawIcon    from '../../assets/images/huellaGrande.png';
-import addIcon    from '../../assets/images/+.png';
-import sendIcon   from '../../assets/images/send.png';
-import homeIcon   from '../../assets/images/home.png';
-import mediaIcon  from '../../assets/images/media.png';
-import perfilIcon from '../../assets/images/perfil.png';
+import petbotIcon from '../../../assets/images/petbot.png';
+import pawIcon    from '../../../assets/images/huellaGrande.png';
+import addIcon    from '../../../assets/images/+.png';
+import sendIcon   from '../../../assets/images/send.png';
+import homeIcon   from '../../../assets/images/home.png';
+import mediaIcon  from '../../../assets/images/media.png';
+import perfilIcon from '../../../assets/images/perfil.png';
 
 // Contexto y auth
-import { PetBotContext } from '../../context/PetBotContext';
-import { auth } from '../../utils/FirebaseConfig';
+import { PetBotContext } from '../../../context/PetBotContext';
+import { auth } from '../../../utils/FirebaseConfig';
 
 export default function Chat() {
   const router = useRouter();
@@ -157,17 +158,7 @@ export default function Chat() {
       </View>
 
       {/* Bottom Tabs */}
-      <View style={styles.tabBar}>
-        {tabs.map((t, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.tabItem}
-            onPress={() => router.replace(t.route)}
-          >
-            <Image source={t.icon} style={styles.tabIcon} />
-          </TouchableOpacity>
-        ))}
-      </View>
+      <BottomTabs />
     </SafeAreaView>
   );
 }

@@ -34,15 +34,9 @@ export default function Login() {
       return;
     }
 
-    // Redirigir administrador sin Firebase
-    if (username.trim().toLowerCase() === 'admin' && password === '12345') {
-      router.replace(Routes.admin);
-      return;
-    }
-
     try {
       await login(username.trim(), password);
-      router.replace(Routes.Home);
+      
     } catch (error: any) {
       let message = 'Correo o contraseña inválidos.';
       switch (error.code) {

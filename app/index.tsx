@@ -1,20 +1,29 @@
-// app/index.tsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { View, ActivityIndicator, StyleSheet, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
+import { AuthContext } from '../context/AuthContext';
 import { Routes } from '../route';
 import { initNotifications } from './services/Notifications';
 
 export default function Splash() {
   const router = useRouter();
+  const { user, userType } = useContext(AuthContext);
 
   useEffect(() => {
-     initNotifications();
+    initNotifications();
+
     const timeout = setTimeout(() => {
-      router.replace(Routes.Login);  // tras 5 s, va a Login
-    }, 5000);
+      if (!user) {
+        router.replace(Routes.Login);
+      } else if (userType === 'admin') {
+        router.replace(Routes.admin);
+      } else {
+        router.replace(Routes.Home);
+      }
+    }, 2000); // tiempo reducido para pruebas (ajústalo a 5000 si quieres)
+
     return () => clearTimeout(timeout);
-  }, []);
+  }, [user, userType]);
 
   return (
     <View style={styles.container}>

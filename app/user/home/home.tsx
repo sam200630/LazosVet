@@ -13,23 +13,24 @@ import {
   UIManager,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Routes } from '../../route';
-import styles from '../../styles/home/home';
-import { PetsContext } from '../../context/PetsContext';
-import { DatesContext, DateType } from '../../context/DatesContext';
+import { Routes } from '../../../route';
+import styles from '../../../styles/home/home';
+import { PetsContext } from '../../../context/PetsContext';
+import { DatesContext, DateType } from '../../../context/DatesContext';
+import BottomTabs from '../../../components/bottonsTab';
 
 // Imágenes estáticas
-import homeIcon           from '../../assets/images/home.png';
-import petbotIcon         from '../../assets/images/petbot.png';
-import mediaIcon          from '../../assets/images/media.png';
-import perfilIcon         from '../../assets/images/perfil.png';
-import notificacionesIcon from '../../assets/images/notificaciones.png';
-import defaultProfile     from '../../assets/images/default-profile.jpeg';
-import calendarioIcon     from '../../assets/images/calendario.png';
-import addIcon            from '../../assets/images/+.png';
-import banner1            from '../../assets/images/banner1.jpg';
-import banner2            from '../../assets/images/banner2.jpg';
-import banner3            from '../../assets/images/banner3.jpg';
+import homeIcon           from '../../../assets/images/home.png';
+import petbotIcon         from '../../../assets/images/petbot.png';
+import mediaIcon          from '../../../assets/images/media.png';
+import perfilIcon         from '../../../assets/images/perfil.png';
+import notificacionesIcon from '../../../assets/images/notificaciones.png';
+import defaultProfile     from '../../../assets/images/default-profile.jpeg';
+import calendarioIcon     from '../../../assets/images/calendario.png';
+import addIcon            from '../../../assets/images/+.png';
+import banner1            from '../../../assets/images/banner1.jpg';
+import banner2            from '../../../assets/images/banner2.jpg';
+import banner3            from '../../../assets/images/banner3.jpg';
 
 const bannerImages = [banner1, banner2, banner3];
 
@@ -112,11 +113,12 @@ export default function Home() {
 
   // Tabs inferiores
   const tabs = [
-    { icon: homeIcon,   label: 'Home',    route: Routes.Home   },
-    { icon: petbotIcon, label: 'Pet bot', route: Routes.Petbot },
-    { icon: mediaIcon,  label: 'Media',   route: Routes.Media  },
-    { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil },
-  ];
+  { icon: homeIcon, label: 'Home', route: '/user/home' },
+  { icon: petbotIcon, label: 'Pet bot', route: '/user/petBot' },
+  { icon: mediaIcon, label: 'Media', route: '/user/media' },
+  { icon: perfilIcon, label: 'Perfil', route: '/user/perfil' },
+];
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -278,18 +280,7 @@ export default function Home() {
       </ScrollView>
 
       {/* Tabs inferiores */}
-      <View style={styles.tabBar}>
-        {tabs.map((tab, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.tabItem}
-            onPress={() => router.replace(tab.route)}
-          >
-            <Image source={tab.icon} style={styles.tabIcon} />
-            <Text style={styles.tabLabel}>{tab.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <BottomTabs />
     </SafeAreaView>
   );
 }

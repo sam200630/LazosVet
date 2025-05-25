@@ -9,15 +9,16 @@ import {
   Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import styles from '../../styles/media/add';
-import goBackIcon   from '../../assets/images/goBack.png';
-import camaraIcon   from '../../assets/images/camara.png';
-import imagenIcon   from '../../assets/images/foto.png';
-import homeIcon     from '../../assets/images/home.png';
-import petbotIcon   from '../../assets/images/petbot.png';
-import mediaIcon    from '../../assets/images/media.png';
-import perfilIcon   from '../../assets/images/perfil.png';
-import { Routes } from '../../route';
+import styles from '../../../styles/media/add';
+import goBackIcon   from '../../../assets/images/goBack.png';
+import camaraIcon   from '../../../assets/images/camara.png';
+import imagenIcon   from '../../../assets/images/foto.png';
+import homeIcon     from '../../../assets/images/home.png';
+import petbotIcon   from '../../../assets/images/petbot.png';
+import mediaIcon    from '../../../assets/images/media.png';
+import perfilIcon   from '../../../assets/images/perfil.png';
+import { Routes } from '../../../route';
+import BottomTabs from '../../../components/bottonsTab';
 
 export default function AddMedia() {
   const router = useRouter();
@@ -71,23 +72,8 @@ export default function AddMedia() {
       </View>
 
       {/* Tabs inferiores */}
-      <View style={styles.tabBar}>
-        {[ 
-          { icon: homeIcon,   label: 'Home',    route: Routes.Home },
-          { icon: petbotIcon, label: 'Pet bot', route: Routes.Petbot },
-          { icon: mediaIcon,  label: 'Media',   route: Routes.Media },
-          { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil },
-        ].map((tab, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.tabItem}
-            onPress={() => router.replace(tab.route)}
-          >
-            <Image source={tab.icon} style={styles.tabIcon} />
-            <Text style={styles.tabLabel}>{tab.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+       <BottomTabs />
+      
     </SafeAreaView>
 );
 }

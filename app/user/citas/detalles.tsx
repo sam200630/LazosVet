@@ -9,16 +9,16 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import styles from '../../styles/citas/detalles';
-import { DatesContext, DateType } from '../../context/DatesContext';
+import styles from '../../../styles/citas/detalles';
+import { DatesContext, DateType } from '../../../context/DatesContext';
 import { doc, deleteDoc } from 'firebase/firestore';
-import { db } from '../../utils/FirebaseConfig';
+import { db } from '../../../utils/FirebaseConfig';
 
 // Assets
-import goBackIcon from '../../assets/images/goBack.png';
-import pawIcon    from '../../assets/images/mascota.png';
+import goBackIcon from '../../../assets/images/goBack.png';
+import pawIcon    from '../../../assets/images/mascota.png';
 import { Route } from 'expo-router/build/Route';
-import { Routes } from '../../route';
+import { Routes } from '../../../route';
 
 export default function DetallesCita() {
   const router = useRouter();

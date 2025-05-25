@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useState,
   useRef,
+  useContext,
 } from 'react';
 import {
   View,
@@ -27,6 +28,8 @@ import { DateType } from '../../context/DatesContext';
 import { Routes } from '../../route';
 import styles from '../../styles/admin/home';
 import { Calendar } from 'react-native-calendars';
+import { AuthContext } from '../../context/AuthContext';
+import BottomTabs from '../../components/bottonsTab';
 
 // Imágenes
 import homeIcon           from '../../assets/images/home.png';
@@ -45,6 +48,7 @@ const bannerImages = [banner1, banner2, banner3];
 export default function AdminHome() {
   const router = useRouter();
   const { width } = useWindowDimensions();
+  
 
   // Habilitar LayoutAnimation en Android
   useEffect(() => {
@@ -56,6 +60,8 @@ export default function AdminHome() {
   // --- Todas las mascotas ---
   const [allPets, setAllPets]       = useState<Pet[]>([]);
   const [loadingPets, setLoadingPets] = useState(true);
+  const { userType } = useContext(AuthContext); 
+  
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'pets'), snap => {
       const list = snap.docs.map(d => {
@@ -157,11 +163,12 @@ export default function AdminHome() {
 
   // --- Tabs inferiores ---
   const tabs = [
-    { icon: homeIcon,   label:'Home',    route: Routes.admin    },
-    { icon: scanIcon,   label:'Escanear', route: Routes.Petbot   },
-    { icon: mediaIcon,  label:'Media',   route: Routes.Media    },
-    { icon: perfilIcon, label:'Perfil',  route: Routes.Perfil   },
-  ];
+  { icon: homeIcon, label: 'Home', route: '/admin/home' },
+  { icon: scanIcon, label: 'Scanner QR', route: '/admin/admin' },
+  { icon: mediaIcon, label: 'Media', route: '/admin/media' },
+  { icon: perfilIcon, label: 'Perfil', route: '/admin/perfil' },
+];
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -315,7 +322,7 @@ export default function AdminHome() {
             <View style={styles.cardButtons}>
               <TouchableOpacity
                 style={styles.cardButton}
-                onPress={()=>router.push(Routes.adminAddCita)}
+                onPress={()=>router.push(Routes.AdminAddCita)}
               >
                 <Text style={styles.cardButtonText}>+ Añadir cita</Text>
               </TouchableOpacity>
@@ -330,14 +337,7 @@ export default function AdminHome() {
       </ScrollView>
 
       {/* Tabs inferiores */}
-      <View style={styles.tabBar}>
-        {tabs.map((tab,i)=>(
-          <TouchableOpacity key={i} style={styles.tabItem} onPress={()=>router.replace(tab.route)}>
-            <Image source={tab.icon} style={styles.tabIcon}/>
-            <Text style={styles.tabLabel}>{tab.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <BottomTabs />
     </SafeAreaView>
   );
 }
