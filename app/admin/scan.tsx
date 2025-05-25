@@ -1,52 +1,68 @@
 // app/admin/scan.tsx
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+  ActivityIndicator,
+  Image,
+} from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import goBackIcon from '../../assets/images/goBack.png';
-import { Image } from 'react-native';
 
 export default function AdminScan() {
-  const router = useRouter();
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
+  const router = useRouter();
+  const cameraRef = useRef(null);
 
-  // Pedir permiso al montar
   useEffect(() => {
-    (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
+    if (!permission) {
+      requestPermission();
+    }
   }, []);
 
   const handleBarCodeScanned = ({ data }: { data: string }) => {
-    if (scanned) return;
-    setScanned(true);
-    // data debería ser el ID de la cita
-    router.replace(`/admin/detallesCitaQRid=${data}`);
+    if (!scanned) {
+      setScanned(true);
+      router.replace(`/admin/detallesCitaQR?id=${data}`);
+    }
   };
 
-  if (hasPermission === null) {
-    return <ActivityIndicator style={styles.loader} />;
+  if (!permission) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#30C5FF" />
+      </View>
+    );
   }
-  if (!hasPermission) {
+
+  if (!permission.granted) {
     return (
       <View style={styles.center}>
         <Text>No se concedió acceso a la cámara.</Text>
+        <TouchableOpacity onPress={requestPermission} style={styles.permissionButton}>
+          <Text style={styles.permissionText}>Conceder permiso</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      {/* Botón atrás */}
       <TouchableOpacity style={styles.back} onPress={() => router.back()}>
         <Image source={goBackIcon} style={styles.backIcon} />
       </TouchableOpacity>
 
-      <BarCodeScanner
-        onBarCodeScanned={handleBarCodeScanned}
+      <CameraView
         style={StyleSheet.absoluteFillObject}
+        onBarcodeScanned={handleBarCodeScanned}
+        barcodeScannerSettings={{
+          barcodeTypes: ['qr'],
+        }}
       />
 
       {scanned && (
@@ -63,10 +79,9 @@ export default function AdminScan() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  center:    { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loader:    { flex: 1, justifyContent: 'center' },
-  back:      { position: 'absolute', top: Platform.OS==='android'? 25: 50, left: 16, zIndex: 10 },
-  backIcon:  { width: 24, height: 24 },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  back: { position: 'absolute', top: Platform.OS === 'android' ? 25 : 50, left: 16, zIndex: 10 },
+  backIcon: { width: 24, height: 24 },
   resetButton: {
     position: 'absolute',
     bottom: 50,
@@ -76,4 +91,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   resetText: { fontWeight: '600' },
+  permissionButton: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: '#30C5FF',
+    borderRadius: 8,
+  },
+  permissionText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
 });

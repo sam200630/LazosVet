@@ -37,7 +37,7 @@ export default {
 
     plugins: [
       'expo-font',
-      'expo-barcode-scanner',
+      'expo-camera',
       'expo-dev-client', // ← Necesario para builds con EAS Dev Client
     ],
 
