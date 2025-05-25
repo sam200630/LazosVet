@@ -1,3 +1,5 @@
+import add from "./styles/media/add";
+
 export const Routes = {
   Login: 'login',
   Register: 'register',
@@ -12,4 +14,5 @@ export const Routes = {
   DetallesCita: 'citas/detalles',
   admin: 'admin/home',
   adminAddCita: 'admin/add-cita',
+  add: 'media/add',
 };
