@@ -1,4 +1,5 @@
 import add from "./styles/media/add";
+import edit_mascota from "./styles/perfil/edit_mascota";
 
 export const Routes = {
   Login: 'login',
@@ -15,4 +16,5 @@ export const Routes = {
   admin: 'admin/home',
   adminAddCita: 'admin/add-cita',
   add: 'media/add',
+  edit_mascota: 'perfil/edit_mascota',
 };

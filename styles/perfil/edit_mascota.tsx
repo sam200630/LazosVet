@@ -2,16 +2,18 @@ import { StyleSheet, Platform, Dimensions } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 export const TAB_BAR_HEIGHT = 60;
+const PAW_SIZE = width * 0.7;
+const PAW_OFFSET = PAW_SIZE * 0.5;
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF',
     paddingTop: Platform.OS === 'android' ? 25 : 0,
   },
   goBack: {
     position: 'absolute',
-    top: Platform.OS === 'android' ? 25 : 0,
+    top: Platform.OS === 'android' ? 25 : 10,
     left: 16,
     zIndex: 2,
   },
@@ -21,16 +23,17 @@ export default StyleSheet.create({
   },
 
   title: {
-    fontSize: 20,
-    fontFamily: 'Poppins-Medium',
+    fontSize: 24,
+    fontFamily: 'Poppins-SemiBold',
     color: '#A15E49',
     textAlign: 'center',
     marginTop: height * 0.08,
+    marginBottom: 16,
   },
 
+  // Foto
   profilePicContainer: {
     alignItems: 'center',
-    marginTop: 16,
     marginBottom: 24,
   },
   profilePic: {
@@ -44,7 +47,7 @@ export default StyleSheet.create({
   addPhotoButton: {
     position: 'absolute',
     bottom: -8,
-    right: (width - 120) / 2 - 16,
+    right: (width - 120)/2 - 16,
     backgroundColor: '#30C5FF',
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -52,21 +55,20 @@ export default StyleSheet.create({
   },
   addPhotoText: {
     fontSize: 12,
-    fontFamily: 'Poppins-Bold',
-    color: '#FFFFFF',
+    fontFamily: 'Poppins-Medium',
+    color: '#FFF',
   },
 
   form: {
     paddingHorizontal: 16,
+    paddingBottom: 24,
   },
-
   label: {
     fontSize: 14,
     fontFamily: 'Poppins-Medium',
     color: '#101419',
     marginBottom: 4,
   },
-
   input: {
     height: 44,
     borderWidth: 1,
@@ -81,31 +83,30 @@ export default StyleSheet.create({
   extraInput: {
     height: 80,
     textAlignVertical: 'top',
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: '#DDD',
-    borderRadius: 12,
     paddingHorizontal: 12,
     backgroundColor: '#FFF',
     color: '#101419',
     marginBottom: 16,
-    fontFamily: 'Poppins-Medium',
   },
 
-  // Selector genérico (especie, género)
+  // Selector de género
   selectorWrapper: {
     marginBottom: 16,
     position: 'relative',
   },
   selectorContainer: {
     height: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: '#DDD',
     borderRadius: 12,
     paddingHorizontal: 12,
     backgroundColor: '#FFF',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
   },
   selectorText: {
     fontSize: 14,
@@ -139,7 +140,7 @@ export default StyleSheet.create({
     color: '#101419',
   },
 
-  // Edad
+  // Edad con unidades
   ageRow: {
     flexDirection: 'row',
     marginBottom: 16,
@@ -147,10 +148,10 @@ export default StyleSheet.create({
   ageLeftInput: {
     flex: 1,
     height: 44,
-    borderWidth: 1,
-    borderColor: '#DDD',
     borderTopLeftRadius: 12,
     borderBottomLeftRadius: 12,
+    borderWidth: 1,
+    borderColor: '#DDD',
     borderRightWidth: 0,
     paddingHorizontal: 12,
     backgroundColor: '#FFF',
@@ -166,10 +167,10 @@ export default StyleSheet.create({
     flex: 1,
   },
   unitContainer: {
-    height: 44,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    height: 44,
     borderTopRightRadius: 12,
     borderBottomRightRadius: 12,
     borderWidth: 1,
@@ -203,6 +204,7 @@ export default StyleSheet.create({
     color: '#101419',
   },
 
+  // Botón
   button: {
     height: 48,
     backgroundColor: '#30C5FF',
@@ -210,7 +212,6 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 24,
-    marginHorizontal: 16,
   },
   buttonDisabled: {
     backgroundColor: '#A0D9FF',
@@ -218,9 +219,19 @@ export default StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontFamily: 'Poppins-Bold',
-    color: '#FFFFFF',
+    color: '#FFF',
   },
 
+  // Error
+  errorText: {
+    fontSize: 16,
+    fontFamily: 'Poppins-Medium',
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+
+  // Tab bar
   tabBar: {
     position: 'absolute',
     left: 0,
@@ -241,11 +252,5 @@ export default StyleSheet.create({
   tabIcon: {
     width: 24,
     height: 24,
-  },
-  tabLabel: {
-    marginTop: 4,
-    fontSize: 10,
-    fontFamily: 'Poppins-Medium',
-    color: '#101419',
   },
 });

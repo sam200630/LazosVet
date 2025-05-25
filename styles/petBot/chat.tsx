@@ -1,3 +1,5 @@
+// styles/petBot/chat.ts
+
 import { StyleSheet, Platform, Dimensions } from 'react-native';
 const { width } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
@@ -27,7 +29,7 @@ export default StyleSheet.create({
     color: '#A15E49',
   },
 
-  // Mensajes (flexible)
+  // Mensajes
   messagesContainer: {
     flex: 1,
     marginHorizontal: 16,
@@ -41,29 +43,74 @@ export default StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     marginTop: 32,
   },
-  bubble: {
-    backgroundColor: '#F2E8E2',
-    borderRadius: 12,
-    padding: 12,
+
+  // Fila de bubble
+  bubbleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
     marginBottom: 8,
-    alignSelf: 'flex-start',
   },
-  bubbleText: {
-    fontFamily: 'Poppins-Regular',
-    color: '#101419',
+  bubbleUserRow: {
+    justifyContent: 'flex-start',
+  },
+  bubbleBotRow: {
+    justifyContent: 'flex-end',
   },
 
-  // Input fijo encima del tabBar
+  // Avatar user
+  userAvatar: {
+    width: 32,
+    height: 32,
+    marginRight: 8,
+  },
+
+  // Bubble general
+  bubble: {
+    maxWidth: width * 0.75,
+    borderRadius: 12,
+    padding: 12,
+  },
+  bubbleContent: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  bubbleMeta: {
+    marginTop: 4,
+    fontSize: 10,
+  },
+
+  // Usuario
+  bubbleUser: {
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#A15E49',
+  },
+  bubbleMetaUser: {
+    color: '#A15E49',
+    fontFamily: 'Poppins-Regular',
+    textAlign: 'right',
+  },
+
+  // Bot
+  bubbleBot: {
+    backgroundColor: '#8AD8FF',
+  },
+  bubbleMetaBot: {
+    color: '#000',
+    fontFamily: 'Poppins-Regular',
+    textAlign: 'left',
+  },
+
+  // Input
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 16,
-    paddingHorizontal: 12,
-    height: 48,
+    margin: 16,
     borderWidth: 1,
     borderColor: '#A15E49',
     borderRadius: 24,
-    marginBottom: 8,
+    paddingHorizontal: 12,
+    height: 48,
   },
   iconButton: {
     padding: 4,
@@ -75,13 +122,12 @@ export default StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    marginHorizontal: 8,
     fontFamily: 'Poppins-Regular',
     color: '#101419',
     height: '100%',
   },
 
-  // Bottom Tabs
+  // TabBar
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -98,11 +144,6 @@ export default StyleSheet.create({
   tabIcon: {
     width: 24,
     height: 24,
-  },
-  tabLabel: {
-    marginTop: 4,
-    fontSize: 10,
-    fontFamily: 'Poppins-Regular',
-    color: '#A15E49',
+    tintColor: '#A15E49',
   },
 });

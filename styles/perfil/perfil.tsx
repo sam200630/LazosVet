@@ -1,5 +1,6 @@
 import { StyleSheet, Platform, Dimensions } from 'react-native';
 const { height } = Dimensions.get('window');
+
 export default StyleSheet.create({
   container: {
     flex: 1,
@@ -12,7 +13,10 @@ export default StyleSheet.create({
     left: 16,
     zIndex: 2,
   },
-  goBackIcon: { width: 24, height: 24 },
+  goBackIcon: {
+    width: 24,
+    height: 24,
+  },
 
   headerRow: {
     flexDirection: 'row',
@@ -37,6 +41,7 @@ export default StyleSheet.create({
     fontFamily: 'Poppins-Medium',
     fontSize: 14,
   },
+
   profilePicContainer: {
     alignItems: 'center',
     marginTop: 16,
@@ -82,32 +87,6 @@ export default StyleSheet.create({
     color: '#101419',
   },
 
-  /* Nuevos estilos de inline-edit */
-  editIcon: {
-    width: 18,
-    height: 18,
-    marginLeft: 8,
-  },
-  textInput: {
-    flex: 1,
-    fontSize: 14,
-    fontFamily: 'Poppins-Medium',
-    color: '#101419',
-    borderBottomWidth: 1,
-    borderColor: '#A15E49',
-    paddingVertical: 2,
-  },
-  saveText: {
-    color: '#30C5FF',
-    fontFamily: 'Poppins-Medium',
-    marginLeft: 8,
-  },
-  cancelText: {
-    color: '#FF3B30',
-    fontFamily: 'Poppins-Medium',
-    marginLeft: 8,
-  },
-
   petsCard: {
     backgroundColor: '#F2E8E2',
     marginHorizontal: 16,
@@ -126,10 +105,18 @@ export default StyleSheet.create({
     marginRight: 8,
   },
   petName: {
+    flex: 1,
     fontSize: 14,
     fontFamily: 'Poppins-Medium',
     color: '#101419',
   },
+
+  editIcon: {
+    width: 18,
+    height: 18,
+    marginHorizontal: 4,
+  },
+
   addPetButton: {
     height: 48,
     backgroundColor: '#30C5FF',
@@ -173,8 +160,14 @@ export default StyleSheet.create({
     borderColor: '#EEE',
     backgroundColor: '#FFF',
   },
-  tabItem: { flex: 1, alignItems: 'center' },
-  tabIcon: { width: 24, height: 24 },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  tabIcon: {
+    width: 24,
+    height: 24,
+  },
   tabLabel: {
     marginTop: 4,
     fontSize: 10,
