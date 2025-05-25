@@ -236,14 +236,24 @@ export default function Home() {
                       <Text style={styles.cardDate}>
                         {`${cita.date}, ${cita.time}`}
                       </Text>
-                      <TouchableOpacity
-                        style={styles.detailButton}
-                        onPress={() =>
-                          router.push(`${Routes.DetallesCita}?id=${cita.id}`)
-                        }
-                      >
-                        <Text style={styles.detailButtonText}>Detalles</Text>
-                      </TouchableOpacity>
+                     <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity
+                  style={styles.detailButton}
+                  onPress={() =>
+                    router.push(`${Routes.DetallesCita}?id=${nextDate.id}`)
+                  }
+                >
+                  <Text style={styles.detailButtonText}>Detalles</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.detailButton}
+                  onPress={() =>
+                    router.push(`${Routes.QR}?id=${nextDate.id}`)
+                  }
+                >
+                  <Text style={styles.detailButtonText}>Ver QR</Text>
+                </TouchableOpacity>
+              </View>
                     </View>
                   </View>
                 ))}

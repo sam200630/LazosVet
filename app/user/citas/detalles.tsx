@@ -13,6 +13,7 @@ import styles from '../../../styles/citas/detalles';
 import { DatesContext, DateType } from '../../../context/DatesContext';
 import { doc, deleteDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../../utils/FirebaseConfig';
+import { AuthContext } from '../../../context/AuthContext';
 
 // Assets
 import goBackIcon from '../../../assets/images/goBack.png';
@@ -23,6 +24,7 @@ export default function DetallesCita() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const id = params.id as string;
+   const { userType } = useContext(AuthContext);
 
   const { dates } = useContext(DatesContext);
   const [cita, setCita] = useState<DateType | null>(null);
@@ -52,7 +54,11 @@ export default function DetallesCita() {
 
 
   const handleConfirm = () => {
-    router.replace(Routes.Home);
+    if (userType === 'admin') {
+      router.replace(Routes.AdminHome);
+    } else {
+      router.replace(Routes.Home);
+    }
   };
 
   const handleCancel = async () => {

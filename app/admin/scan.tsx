@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
+import { Routes } from '../../route';
 import goBackIcon from '../../assets/images/goBack.png';
 
 export default function AdminScan() {
@@ -53,7 +54,7 @@ export default function AdminScan() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.back} onPress={() => router.back()}>
+      <TouchableOpacity style={styles.back} onPress={() => router.replace(Routes.AdminHome)}>
         <Image source={goBackIcon} style={styles.backIcon} />
       </TouchableOpacity>
 

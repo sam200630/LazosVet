@@ -16,7 +16,7 @@ export default function Splash() {
       if (!user) {
         router.replace(Routes.Login);
       } else if (userType === 'admin') {
-        router.replace(Routes.admin);
+        router.replace(Routes.AdminHome);
       } else {
         router.replace(Routes.Home);
       }
