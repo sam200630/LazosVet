@@ -10,4 +10,6 @@ export const Routes = {
   Petbot: 'petBot/chat',
   QR: 'citas/qr',
   DetallesCita: 'citas/detalles',
+  admin: 'admin/home',
+  adminAddCita: 'admin/add-cita',
 };

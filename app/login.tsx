@@ -18,25 +18,28 @@ export default function Login() {
   const router = useRouter();
   const { login } = useContext(AuthContext);
 
-  const [username, setUsername]     = useState('');
-  const [password, setPassword]     = useState('');
+  const [username, setUsername]         = useState('');
+  const [password, setPassword]         = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { width } = useWindowDimensions();
-  const isWeb = Platform.OS === 'web';
+  const isWeb     = Platform.OS === 'web';
   const formWidth = isWeb ? Math.min(400, width * 0.8) : width * 0.9;
 
   const handleLogin = async () => {
-    // limpiar mensajes previos
     setErrorMessage(null);
 
-    // 1) Validar campos completos
     if (!username.trim() || !password) {
       setErrorMessage('Por favor completa todos los campos.');
       return;
     }
 
-    // 2) Intentar login y capturar errores
+    // Redirigir administrador sin Firebase
+    if (username.trim().toLowerCase() === 'admin' && password === '12345') {
+      router.replace(Routes.admin);
+      return;
+    }
+
     try {
       await login(username.trim(), password);
       router.replace(Routes.Home);
