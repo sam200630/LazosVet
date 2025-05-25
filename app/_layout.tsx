@@ -9,6 +9,7 @@ import { PetsProvider } from '../context/PetsContext';
 import { DatesProvider } from '../context/DatesContext';
 import { PetBotProvider } from '../context/PetBotContext';
 import { MediaProvider } from '../context/MediaContext';
+import { initNotifications } from './services/Notifications';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -46,9 +47,9 @@ export default function RootLayout() {
           <PetsProvider>
             <DatesProvider>
               <PetBotProvider>
-                <MediaProvider>
+                
                   <Stack screenOptions={{ headerShown: false }} />
-                </MediaProvider> 
+                
               </PetBotProvider>
             </DatesProvider>
           </PetsProvider>  

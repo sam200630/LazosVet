@@ -12,8 +12,10 @@ import {
   DocumentData,
   getDocs,
 } from 'firebase/firestore';
+
 import { AuthContext } from './AuthContext';
 import { PetsContext, Pet } from './PetsContext';
+import { scheduleReminder } from '../app/services/Notifications';  // ← CAMBIO: importamos
 
 export interface DateType {
   id: string;
@@ -29,14 +31,13 @@ export interface DatesContextType {
   dates: DateType[];
   loading: boolean;
   petOptions: Pet[];
-  /** ← CAMBIO: ahora devuelve Promise<string> en lugar de void */
   addDate: (data: {
     petId: string;
     reason: string;
     notes?: string;
     date: string;
     time: string;
-  }) => Promise<string>;
+  }) => Promise<string>;  // ← retorna el ID de la cita
   refreshDates: () => void;
   OtherDates: () => Promise<DateType[]>;
 }
@@ -45,14 +46,12 @@ export const DatesContext = createContext<DatesContextType>({
   dates: [],
   loading: true,
   petOptions: [],
-  addDate: async () => '',        // ← CAMBIO: retorna string vacío
+  addDate: async () => '',       
   refreshDates: () => {},
   OtherDates: async () => [],
 });
 
-export const DatesProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const DatesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useContext(AuthContext);
   const { pets } = useContext(PetsContext);
   const [dates, setDates] = useState<DateType[]>([]);
@@ -88,7 +87,6 @@ export const DatesProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => unsubscribe();
   }, [user]);
 
-  /** ← CAMBIO: ahora devuelve el id del nuevo documento */
   const addDate = async ({
     petId,
     reason,
@@ -105,6 +103,8 @@ export const DatesProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!user) throw new Error('Usuario no autenticado');
     const pet = pets.find(p => p.id === petId);
     const petName = pet ? pet.name : '';
+
+    // 1️⃣ Crear la cita en Firestore
     const docRef = await addDoc(collection(db, 'dates'), {
       userId: user.uid,
       petId,
@@ -115,7 +115,19 @@ export const DatesProvider: React.FC<{ children: React.ReactNode }> = ({
       time,
       createdAt: serverTimestamp(),
     });
-    return docRef.id;                // ← CAMBIO: retornamos el id
+    const newId = docRef.id;  // ← CAMBIO: guardamos el ID
+
+    // 2️⃣ Programar notificación local 24h antes
+    try {
+      await scheduleReminder(
+        petName,
+        reason,
+      );
+    } catch (e) {
+      console.warn('Error al programar recordatorio:', e);
+    }
+
+    return newId;  // ← CAMBIO: devolvemos el ID
   };
 
   const refreshDates = () => {
