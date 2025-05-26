@@ -37,7 +37,7 @@ export default StyleSheet.create({
   },
   bannerImage: {
     width: '100%',
-    height: undefined,      // altura automática
+    height: undefined,      // altura automática según aspectRatio
     borderRadius: 12,
   },
   navButton: {
@@ -46,14 +46,10 @@ export default StyleSheet.create({
     bottom: 0,
     width: '50%',
   },
-  navLeft: {
-    left: 0,
-  },
-  navRight: {
-    right: 0,
-  },
+  navLeft: { left: 0 },
+  navRight: { right: 0 },
 
-  // Indicadores del carrusel
+  // Indicadores
   dots: {
     position: 'absolute',
     bottom: 8,
@@ -140,7 +136,6 @@ export default StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: '#101419',
   },
-
   cardDateRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -152,7 +147,6 @@ export default StyleSheet.create({
     fontFamily: 'Poppins-Light',
     color: '#101419',
   },
-
   detailButton: {
     borderWidth: 1,
     borderColor: '#101419',
@@ -167,7 +161,6 @@ export default StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: '#101419',
   },
-
   cardButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -187,12 +180,11 @@ export default StyleSheet.create({
     color: '#000000',
   },
 
-  // Tab bar
+  // BottomTabs (necesario para <BottomTabs />)
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingVertical: 12,
     borderTopWidth: 1,
     borderColor: '#EEE',
     backgroundColor: '#FFF',
@@ -200,6 +192,7 @@ export default StyleSheet.create({
   tabItem: {
     flex: 1,
     alignItems: 'center',
+    paddingVertical: 12,
   },
   tabIcon: {
     width: 24,
@@ -209,6 +202,6 @@ export default StyleSheet.create({
     marginTop: 4,
     fontSize: 10,
     fontFamily: 'Poppins-Regular',
-    color: '#A15E49',
+    color: '#101419',
   },
 });

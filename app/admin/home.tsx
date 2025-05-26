@@ -1,5 +1,3 @@
-// app/admin/home.tsx
-
 import React, {
   useEffect,
   useState,
@@ -31,15 +29,14 @@ import { Calendar } from 'react-native-calendars';
 import { AuthContext } from '../../context/AuthContext';
 import BottomTabs from '../../components/bottonsTab';
 
-// Imágenes
 import homeIcon           from '../../assets/images/home.png';
-import scanIcon         from '../../assets/images/escanear.png';
+import scanIcon           from '../../assets/images/escanear.png';
 import mediaIcon          from '../../assets/images/media.png';
 import perfilIcon         from '../../assets/images/perfil.png';
 import notificacionesIcon from '../../assets/images/notificaciones.png';
 import defaultProfile     from '../../assets/images/default-profile.jpeg';
 import calendarioIcon     from '../../assets/images/calendario.png';
-import banner1            from '../../assets/images/banner1.jpg';
+import banner1            from '../../assets/images/banner1.png';
 import banner2            from '../../assets/images/banner2.jpg';
 import banner3            from '../../assets/images/banner3.jpg';
 
@@ -48,72 +45,59 @@ const bannerImages = [banner1, banner2, banner3];
 export default function AdminHome() {
   const router = useRouter();
   const { width } = useWindowDimensions();
-  
 
-  // Habilitar LayoutAnimation en Android
+  // Enable LayoutAnimation on Android
   useEffect(() => {
     if (Platform.OS === 'android') {
       UIManager.setLayoutAnimationEnabledExperimental?.(true);
     }
   }, []);
 
-  // --- Todas las mascotas ---
-  const [allPets, setAllPets]       = useState<Pet[]>([]);
+  // Todas las mascotas
+  const [allPets, setAllPets] = useState<Pet[]>([]);
   const [loadingPets, setLoadingPets] = useState(true);
-  const { userType } = useContext(AuthContext); 
-  
+  const { userType } = useContext(AuthContext);
+
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, 'pets'), snap => {
-      const list = snap.docs.map(d => {
-        const data = d.data() as any;
-        return {
+    const unsub = onSnapshot(
+      collection(db, 'pets'),
+      snap => {
+        setAllPets(snap.docs.map(d => ({
           id: d.id,
-          name: data.name,
-          breed: data.breed,
-          gender: data.gender,
-          age: data.age,
-          ageUnit: data.ageUnit,
-          weight: data.weight,
-          conditions: data.conditions,
-          photoUrl: data.photoUrl || null,
-        } as Pet;
-      });
-      setAllPets(list);
-      setLoadingPets(false);
-    }, () => setLoadingPets(false));
+          ...(d.data() as any)
+        } as Pet)));
+        setLoadingPets(false);
+      },
+      () => setLoadingPets(false)
+    );
     return () => unsub();
   }, []);
 
-  // --- Todas las citas ---
-  const [allDates, setAllDates]       = useState<DateType[]>([]);
+  // Todas las citas
+  const [allDates, setAllDates] = useState<DateType[]>([]);
   const [loadingDates, setLoadingDates] = useState(true);
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, 'dates'), snap => {
-      const list = snap.docs.map(d => {
-        const data = d.data() as any;
-        return {
+    const unsub = onSnapshot(
+      collection(db, 'dates'),
+      snap => {
+        setAllDates(snap.docs.map(d => ({
           id: d.id,
-          petId: data.petId,
-          petName: data.petName,
-          reason: data.reason,
-          notes: data.notes || '',
-          date: data.date,
-          time: data.time,
-        } as DateType;
-      });
-      setAllDates(list);
-      setLoadingDates(false);
-    }, () => setLoadingDates(false));
+          ...(d.data() as any)
+        } as DateType)));
+        setLoadingDates(false);
+      },
+      () => setLoadingDates(false)
+    );
     return () => unsub();
   }, []);
 
-  // --- Búsqueda de mascotas ---
+  // Búsqueda de mascotas
   const [searchText, setSearchText] = useState('');
   const filteredPets = allPets.filter(p =>
     p.name.toLowerCase().includes(searchText.trim().toLowerCase())
   );
 
-  // --- Filtros de citas ---
+  // Filtros de citas
   const [dateFilter, setDateFilter] = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -121,7 +105,7 @@ export default function AdminHome() {
   const [showDateFilter, setShowDateFilter] = useState(false);
 
   const reasonOptions = ['Todas','Baño','Consulta','Control'];
-  const [reasonFilter, setReasonFilter]     = useState('Todas');
+  const [reasonFilter, setReasonFilter] = useState('Todas');
   const [showReasonFilter, setShowReasonFilter] = useState(false);
 
   const filteredDates = allDates.filter(d =>
@@ -129,46 +113,51 @@ export default function AdminHome() {
     (reasonFilter === 'Todas' || d.reason === reasonFilter)
   );
   const nextDate = filteredDates.length > 0
-    ? [...filteredDates].sort((a,b)=>
+    ? filteredDates.sort((a,b)=>
         new Date(`${a.date}T${a.time}`).getTime() -
         new Date(`${b.date}T${b.time}`).getTime()
       )[0]
     : null;
 
-  // --- Carrusel animado ---
-  const [bannerIndex, setBannerIndex] = useState(0);
-  const [direction, setDirection]     = useState<'next'|'prev'>('next');
+  // Carrusel animado
+  const [bannerIndex, setBannerIndex]     = useState(0);
+  const [direction, setDirection]         = useState<'next'|'prev'>('next');
   const slideAnim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     slideAnim.setValue(direction==='next'? width : -width);
     Animated.timing(slideAnim, { toValue:0, duration:500, useNativeDriver:true }).start();
   }, [bannerIndex]);
+
   useEffect(() => {
     const iv = setInterval(() => {
       setDirection('next');
-      setBannerIndex(i => (i+1)%bannerImages.length);
+      setBannerIndex(i=>(i+1)%bannerImages.length);
     },15000);
     return () => clearInterval(iv);
   }, []);
+
   const prevBanner = () => { setDirection('prev'); setBannerIndex(i=>(i-1+bannerImages.length)%bannerImages.length); };
   const nextBanner = () => { setDirection('next'); setBannerIndex(i=>(i+1)%bannerImages.length); };
 
-  // --- Expandir lista de citas ---
+  // Calcular aspect ratio
+  const asset = bannerImages[bannerIndex];
+  const { width: imgW, height: imgH } = Image.resolveAssetSource(asset);
+  const aspectRatio = imgW / imgH;
+
+  // Expandir lista de citas con altura dinámica
   const [expanded, setExpanded] = useState(false);
   const expandAnim = useRef(new Animated.Value(0)).current;
+  const [contentHeight, setContentHeight] = useState(0);
+
   const toggleExpand = () => {
-    Animated.timing(expandAnim, { toValue: expanded?0:1, duration:300, useNativeDriver:false }).start();
+    Animated.timing(expandAnim, {
+      toValue: expanded ? 0 : 1,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
     setExpanded(e=>!e);
   };
-
-  // --- Tabs inferiores ---
-  const tabs = [
-  { icon: homeIcon, label: 'Home', route: '/admin/home' },
-  { icon: scanIcon, label: 'Scanner QR', route: '/admin/admin' },
-  { icon: mediaIcon, label: 'Media', route: '/admin/media' },
-  { icon: perfilIcon, label: 'Perfil', route: '/admin/perfil' },
-];
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -176,18 +165,27 @@ export default function AdminHome() {
       <View style={styles.header}>
         <Text style={styles.title}>Admin Home</Text>
         <TouchableOpacity>
-          <Image source={notificacionesIcon} style={styles.icon}/>
+          <Image source={notificacionesIcon} style={styles.icon} />
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom:32 }}>
         {/* Carrusel */}
-        <View style={[styles.bannerContainer,{ width:width-32 }]}>
-          <Animated.View style={{ transform:[{ translateX:slideAnim }] }}>
-            <Image source={bannerImages[bannerIndex]} style={styles.bannerImage} resizeMode="cover"/>
+        <View style={[styles.bannerContainer,{ width: width - 32 }]}>
+          <Animated.View style={{ transform:[{ translateX: slideAnim }] }}>
+            <Image
+              source={asset}
+              style={[styles.bannerImage, { aspectRatio }]}
+              resizeMode="cover"
+            />
           </Animated.View>
-          <TouchableOpacity style={[styles.navButton,styles.navLeft]} onPress={prevBanner}/>
-          <TouchableOpacity style={[styles.navButton,styles.navRight]} onPress={nextBanner}/>
+          <TouchableOpacity style={[styles.navButton, styles.navLeft]} onPress={prevBanner}/>
+          <TouchableOpacity style={[styles.navButton, styles.navRight]} onPress={nextBanner}/>
+          <View style={styles.dots}>
+            {bannerImages.map((_, i) => (
+              <View key={i} style={[styles.dot, i===bannerIndex && styles.dotActive]} />
+            ))}
+          </View>
         </View>
 
         {/* Mascotas */}
@@ -220,11 +218,7 @@ export default function AdminHome() {
 
         {/* Filtros */}
         <View style={styles.filterSection}>
-          {/* Fecha */}
-          <TouchableOpacity
-            style={styles.filterButton}
-            onPress={()=>setShowDateFilter(v=>!v)}
-          >
+          <TouchableOpacity style={styles.filterButton} onPress={()=>setShowDateFilter(v=>!v)}>
             <Image source={calendarioIcon} style={styles.filterIcon}/>
             <Text style={styles.filterButtonText}>{dateFilter}</Text>
           </TouchableOpacity>
@@ -238,15 +232,14 @@ export default function AdminHome() {
                 }}
                 markedDates={{ [dateFilter]: { selected:true } }}
                 theme={{
-                  arrowColor: '#A15E49',
-                  todayTextColor: '#30C5FF',
-                  selectedDayBackgroundColor: '#30C5FF',
+                  arrowColor:'#A15E49',
+                  todayTextColor:'#30C5FF',
+                  selectedDayBackgroundColor:'#30C5FF',
                 }}
                 style={styles.calendar}
               />
             </View>
           )}
-          {/* Motivo */}
           <TouchableOpacity
             style={[styles.filterButton, styles.reasonFilter]}
             onPress={()=>setShowReasonFilter(v=>!v)}
@@ -276,7 +269,6 @@ export default function AdminHome() {
           <ActivityIndicator size="small" color="#30C5FF" style={{ marginVertical:16 }}/>
         ) : nextDate ? (
           <View style={styles.card}>
-            {/* Cita principal */}
             <View style={styles.cardHeader}>
               <Image source={calendarioIcon} style={styles.cardIcon}/>
               <Text style={styles.cardTitle}>{`${nextDate.reason} ${nextDate.petName}`}</Text>
@@ -293,11 +285,13 @@ export default function AdminHome() {
 
             {/* Expandible */}
             <Animated.View style={{
-              height: expandAnim.interpolate({ inputRange:[0,1], outputRange:[0,200] }),
+              height: expandAnim.interpolate({ inputRange:[0,1], outputRange:[0, contentHeight] }),
               opacity: expandAnim,
               overflow:'hidden',
             }}>
-              <ScrollView showsVerticalScrollIndicator style={{ marginTop:12 }}>
+              <View
+                onLayout={e=>setContentHeight(e.nativeEvent.layout.height)}
+              >
                 {filteredDates.map(c=>(
                   <View key={c.id} style={{ marginBottom:12 }}>
                     <View style={styles.cardHeader}>
@@ -315,10 +309,9 @@ export default function AdminHome() {
                     </View>
                   </View>
                 ))}
-              </ScrollView>
+              </View>
             </Animated.View>
 
-            {/* Acción: Añadir cita usa ahora adminAddCita */}
             <View style={styles.cardButtons}>
               <TouchableOpacity
                 style={styles.cardButton}

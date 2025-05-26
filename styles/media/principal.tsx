@@ -1,6 +1,5 @@
 import { StyleSheet, Platform, Dimensions } from 'react-native';
-
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const TAB_BAR_HEIGHT = 60;
 
 export default StyleSheet.create({
@@ -20,7 +19,9 @@ export default StyleSheet.create({
   icon: {
     width: 24,
     height: 24,
+    tintColor: '#101419',
   },
+
   tabSelector: {
     flexDirection: 'row',
     backgroundColor: '#F0F0F0',
@@ -68,32 +69,35 @@ export default StyleSheet.create({
     fontFamily: 'Poppins-Medium',
     color: '#101419',
   },
+
   postImagePlaceholder: {
     width: '100%',
-    height: width * 0.8,
-    backgroundColor: '#E0E0E0',
+    aspectRatio: 1.2,
     borderRadius: 12,
+    backgroundColor: '#E0E0E0',
     marginBottom: 8,
   },
+
+  overlay: {
+    position: 'absolute',
+    top: '40%',
+    left: '40%',
+    width: 80,
+    height: 80,
+    opacity: 0.8,
+  },
+
   postActions: {
     flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 4,
   },
-  actionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 16,
-  },
   actionIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 4,
+    width: 24,
+    height: 24,
+    marginRight: 8,
   },
-  actionText: {
-    fontSize: 12,
-    fontFamily: 'Poppins-Regular',
-    color: '#101419',
-  },
+
   description: {
     fontSize: 12,
     fontFamily: 'Poppins-Regular',
