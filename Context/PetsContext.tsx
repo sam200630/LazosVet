@@ -9,6 +9,7 @@ import {
   onSnapshot,
   setDoc,
   doc as firestoreDoc,
+  getDocs,
 } from 'firebase/firestore';
 import {
   getStorage,
@@ -29,6 +30,7 @@ export interface Pet {
   weight: number;
   conditions: string;
   photoUrl: string | null;
+  userId: string; // ← añadido aquí
 }
 
 export interface PetsContextType {
@@ -37,17 +39,17 @@ export interface PetsContextType {
   addPet: (
     petData: Omit<Pet, 'id' | 'photoUrl'> & { photoLocalUri?: string }
   ) => Promise<void>;
+  getAllPets: () => Promise<Pet[]>;
 }
 
 export const PetsContext = createContext<PetsContextType>({
   pets: [],
   loading: true,
   addPet: async () => {},
+  getAllPets: async () => [],
 });
 
-export const PetsProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const PetsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,10 +61,7 @@ export const PetsProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
-    const q = query(
-      collection(db, 'pets'),
-      where('userId', '==', user.uid)
-    );
+    const q = query(collection(db, 'pets'), where('userId', '==', user.uid));
     const unsub = onSnapshot(q, snap => {
       const list = snap.docs.map(d => {
         const data = d.data() as any;
@@ -77,6 +76,7 @@ export const PetsProvider: React.FC<{ children: React.ReactNode }> = ({
           weight: data.weight,
           conditions: data.conditions,
           photoUrl: data.photoUrl || null,
+          userId: data.userId, // ← importante para filtros
         } as Pet;
       });
       setPets(list);
@@ -91,7 +91,6 @@ export const PetsProvider: React.FC<{ children: React.ReactNode }> = ({
   ) => {
     if (!user) throw new Error('Usuario no autenticado');
 
-    // 1) crea el doc sin foto
     const docRef = await addDoc(collection(db, 'pets'), {
       userId: user.uid,
       name: petData.name,
@@ -104,7 +103,6 @@ export const PetsProvider: React.FC<{ children: React.ReactNode }> = ({
       conditions: petData.conditions,
     });
 
-    // 2) sube la foto (si existe) y guarda URL
     if (petData.photoLocalUri) {
       const resp = await fetch(petData.photoLocalUri);
       const blob = await resp.blob();
@@ -118,11 +116,30 @@ export const PetsProvider: React.FC<{ children: React.ReactNode }> = ({
         { merge: true }
       );
     }
-    // ¡onSnapshot se encargará de actualizar automáticamente!
+  };
+
+  const getAllPets = async (): Promise<Pet[]> => {
+    const snap = await getDocs(collection(db, 'pets'));
+    return snap.docs.map(d => {
+      const data = d.data() as any;
+      return {
+        id: d.id,
+        name: data.name,
+        animalType: data.animalType,
+        breed: data.breed,
+        gender: data.gender,
+        age: data.age,
+        ageUnit: data.ageUnit,
+        weight: data.weight,
+        conditions: data.conditions,
+        photoUrl: data.photoUrl || null,
+        userId: data.userId, // ← añadido aquí también
+      } as Pet;
+    });
   };
 
   return (
-    <PetsContext.Provider value={{ pets, loading, addPet }}>
+    <PetsContext.Provider value={{ pets, loading, addPet, getAllPets }}>
       {children}
     </PetsContext.Provider>
   );
