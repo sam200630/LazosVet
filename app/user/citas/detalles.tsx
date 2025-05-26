@@ -64,7 +64,12 @@ export default function DetallesCita() {
   const handleCancel = async () => {
     try {
       await deleteDoc(doc(db, 'dates', id));
-      router.replace(Routes.Home);
+      if (userType === 'admin') {
+        router.replace(Routes.AdminHome);
+      }
+      else {
+        router.replace(Routes.Home);
+      }
     } catch (e) {
       Alert.alert('Error', 'No se pudo cancelar la cita.');
     }

@@ -150,6 +150,7 @@ export default function AddAppointment() {
     try {
       setLoading(true);
       const docRef = await addDoc(collection(db,'dates'), {
+        userId: clientId,           // ← ✅ Clave para que el usuario vea la cita
         userName: client,
         petName: pet,
         reason,
@@ -157,7 +158,8 @@ export default function AddAppointment() {
         date,
         time,
         createdAt: serverTimestamp(),
-      });
+});
+
       router.replace(`${Routes.QR}?id=${docRef.id}`);
     } catch (e) {
       console.error(e);

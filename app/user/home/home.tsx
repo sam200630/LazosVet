@@ -176,7 +176,7 @@ export default function Home() {
           ))}
           <TouchableOpacity
             style={[styles.petCard, styles.addPetCard]}
-            onPress={() => router.push(Routes.AddAppointment)}
+            onPress={() => router.push(Routes.AddMascota)}
           >
             <Image source={addIcon} style={styles.addPetIcon} />
           </TouchableOpacity>
