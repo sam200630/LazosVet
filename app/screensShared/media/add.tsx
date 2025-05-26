@@ -82,7 +82,7 @@ export default function AddMedia() {
       )}
 
       {/* Descripción */}
-      <Text style={styles.label}>Recomendaciones adicionales</Text>
+      <Text style={styles.label}>Descripcion</Text>
       <TextInput
         style={styles.input}
         placeholder="Añade una descripción interesante"
