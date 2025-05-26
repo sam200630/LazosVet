@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -16,13 +16,11 @@ import { Routes } from '../../../route';
 import { CameraModal } from '../../../components/CameraModal';
 import { PetsContext } from '../../../context/PetsContext';
 import BottomTabs from '../../../components/bottonsTab';
+import { getDogBreeds, getCatBreeds } from '../../services/breedAPI';
+
 
 // íconos...
 import goBackIcon    from '../../../assets/images/goBack.png';
-import homeIcon      from '../../../assets/images/home.png';
-import petbotIcon    from '../../../assets/images/petbot.png';
-import mediaIcon     from '../../../assets/images/media.png';
-import perfilIcon    from '../../../assets/images/perfil.png';
 import expanderIcon  from '../../../assets/images/expander.png';
 
 export default function AddMascota() {
@@ -41,6 +39,9 @@ export default function AddMascota() {
   const [showUnits, setShowUnits] = useState(false);
   const [weight, setWeight]   = useState('');
   const [conds, setConds]     = useState('');
+  const [breeds, setBreeds] = useState<string[]>([]);
+  const [showBreedDropdown, setShowBreedDropdown] = useState(false);
+
 
   // Photo
   const [photoUri, setPhotoUri]       = useState<string | null>(null);
@@ -59,7 +60,7 @@ export default function AddMascota() {
   const handleSubmit = async () => {
     await addPet({
       name,
-      animalType: '', // TODO: set the correct animal type value
+      animalType: species, // TODO: set the correct animal type value
       breed,
       gender,
       age: parseInt(age, 10),
@@ -70,13 +71,17 @@ export default function AddMascota() {
     });
     router.replace(Routes.Home);
   };
+  
+  useEffect(() => {
+  if (species === 'Perro') {
+    getDogBreeds().then(setBreeds);
+  } else if (species === 'Gato') {
+    getCatBreeds().then(setBreeds);
+  } else {
+    setBreeds([]);
+  }
+}, [species]);
 
-  const tabs = [
-    { icon: homeIcon,   label: 'Home',    route: Routes.Home },
-    { icon: petbotIcon, label: 'Pet bot', route: Routes.Petbot },
-    { icon: mediaIcon,  label: 'Media',   route: Routes.Media },
-    { icon: perfilIcon, label: 'Perfil',  route: Routes.Perfil },
-  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -125,18 +130,7 @@ export default function AddMascota() {
             value={name}
             onChangeText={setName}
           />
-
-          {/* Raza */}
-          <Text style={styles.label}>Raza</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ej: Labrador"
-            placeholderTextColor="#999"
-            value={breed}
-            onChangeText={setBreed}
-          />
-
-          {/* Especie */}
+            {/* Especie */}
           <Text style={styles.label}>Especie</Text>
           <View style={styles.selectorWrapper}>
             <TouchableOpacity
@@ -165,6 +159,48 @@ export default function AddMascota() {
               </View>
             )}
           </View>
+
+          <Text style={styles.label}>Raza</Text>
+              {(species === 'Perro' || species === 'Gato') ? (
+                <View style={styles.selectorWrapper}>
+                  <TouchableOpacity
+                    style={styles.selectorContainer}
+                    onPress={() => setShowBreedDropdown(v => !v)}
+                  >
+                    <Text style={breed ? styles.selectorText : styles.selectorPlaceholder}>
+                      {breed || 'Selecciona raza'}
+                    </Text>
+                    <Image source={expanderIcon} style={styles.expanderIcon} />
+                  </TouchableOpacity>
+                  {showBreedDropdown && (
+                    <View style={styles.dropdown}>
+                      {breeds.map(b => (
+                        <TouchableOpacity
+                          key={b}
+                          style={styles.option}
+                          onPress={() => {
+                            setBreed(b);
+                            setShowBreedDropdown(false);
+                          }}
+                        >
+                          <Text style={styles.optionText}>{b}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ej: Canario"
+                  placeholderTextColor="#999"
+                  value={breed}
+                  onChangeText={setBreed}
+                />
+              )}
+
+
+        
 
           {/* Género */}
           <Text style={styles.label}>Género</Text>
