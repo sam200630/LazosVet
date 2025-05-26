@@ -28,7 +28,7 @@ import notificacionesIcon from '../../../assets/images/notificaciones.png';
 import defaultProfile     from '../../../assets/images/default-profile.jpeg';
 import calendarioIcon     from '../../../assets/images/calendario.png';
 import addIcon            from '../../../assets/images/+.png';
-import banner1            from '../../../assets/images/banner1.jpg';
+import banner1            from '../../../assets/images/banner1.png';
 import banner2            from '../../../assets/images/banner2.jpg';
 import banner3            from '../../../assets/images/banner3.jpg';
 
@@ -38,25 +38,30 @@ export default function Home() {
   const router = useRouter();
   const { width } = useWindowDimensions();
 
-  // LayoutAnimation en Android
+  // Enable LayoutAnimation on Android
   useEffect(() => {
     if (Platform.OS === 'android') {
       UIManager.setLayoutAnimationEnabledExperimental?.(true);
     }
   }, []);
 
-  // Contextos
   const { pets } = useContext(PetsContext);
   const { dates, loading: loadingDates, OtherDates } = useContext(DatesContext);
 
-  // Próxima cita
-  const nextDate =
-    dates.length > 0
-      ? [...dates].sort((a, b) =>
-          new Date(`${a.date}T${a.time}`).getTime() -
-          new Date(`${b.date}T${b.time}`).getTime()
-        )[0]
-      : null;
+  // Filtrar sólo citas hoy o en el futuro
+  const now = new Date();
+  const futureDates = dates.filter(d => {
+    const dt = new Date(`${d.date}T${d.time}`);
+    return dt >= now;
+  });
+
+  // Próxima cita de las futuras
+  const nextDate = futureDates.length > 0
+    ? [...futureDates].sort((a, b) =>
+        new Date(`${a.date}T${a.time}`).getTime() -
+        new Date(`${b.date}T${b.time}`).getTime()
+      )[0]
+    : null;
 
   // Carrusel animado
   const [bannerIndex, setBannerIndex] = useState(0);
@@ -89,19 +94,20 @@ export default function Home() {
     setBannerIndex(i => (i + 1) % bannerImages.length);
   };
 
-  // Extraer proporción de la imagen actual
+  // Aspect ratio para mantener la proporción
   const { width: imgW, height: imgH } = Image.resolveAssetSource(bannerImages[bannerIndex]);
   const aspectRatio = imgW / imgH;
 
-  // Citas expandibles
+  // Citas "Ver todos"
   const [expanded, setExpanded] = useState(false);
   const [allDates, setAllDates] = useState<DateType[]>([]);
+  const [contentHeight, setContentHeight] = useState(0);
   const expandAnim = useRef(new Animated.Value(0)).current;
 
   const toggleExpand = async () => {
     if (!expanded) {
-      const result = await OtherDates();
-      setAllDates(result);
+      const others = await OtherDates();
+      setAllDates(others.filter(d => new Date(`${d.date}T${d.time}`) >= now));
     }
     Animated.timing(expandAnim, {
       toValue: expanded ? 0 : 1,
@@ -111,14 +117,13 @@ export default function Home() {
     setExpanded(e => !e);
   };
 
-  // Tabs inferiores
+  // Bottom tabs
   const tabs = [
-  { icon: homeIcon, label: 'Home', route: '/user/home' },
-  { icon: petbotIcon, label: 'Pet bot', route: '/user/petBot' },
-  { icon: mediaIcon, label: 'Media', route: '/user/media' },
-  { icon: perfilIcon, label: 'Perfil', route: '/user/perfil' },
-];
-
+    { icon: homeIcon,   label: 'Home',    route: '/user/home'   },
+    { icon: petbotIcon, label: 'Pet bot', route: '/user/petBot' },
+    { icon: mediaIcon,  label: 'Media',   route: '/user/media'  },
+    { icon: perfilIcon, label: 'Perfil',  route: '/user/perfil' },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -144,10 +149,7 @@ export default function Home() {
           <TouchableOpacity style={[styles.navButton, styles.navRight]} onPress={nextBanner} />
           <View style={styles.dots}>
             {bannerImages.map((_, i) => (
-              <View
-                key={i}
-                style={[styles.dot, i === bannerIndex && styles.dotActive]}
-              />
+              <View key={i} style={[styles.dot, i === bannerIndex && styles.dotActive]} />
             ))}
           </View>
         </View>
@@ -174,7 +176,7 @@ export default function Home() {
           ))}
           <TouchableOpacity
             style={[styles.petCard, styles.addPetCard]}
-            onPress={() => router.push(Routes.AddMascota)}
+            onPress={() => router.push(Routes.AddAppointment)}
           >
             <Image source={addIcon} style={styles.addPetIcon} />
           </TouchableOpacity>
@@ -186,6 +188,7 @@ export default function Home() {
           <ActivityIndicator style={{ marginVertical: 16 }} size="small" color="#30C5FF" />
         ) : nextDate ? (
           <View style={styles.card}>
+            {/* Principal */}
             <View style={styles.cardHeader}>
               <Image source={calendarioIcon} style={styles.cardIcon} />
               <Text style={styles.cardTitle}>
@@ -199,65 +202,86 @@ export default function Home() {
               <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity
                   style={styles.detailButton}
-                  onPress={() =>
-                    router.push(`${Routes.DetallesCita}?id=${nextDate.id}`)
-                  }
+                  onPress={() => router.push(`${Routes.DetallesCita}?id=${nextDate.id}`)}
                 >
                   <Text style={styles.detailButtonText}>Detalles</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.detailButton}
-                  onPress={() =>
-                    router.push(`${Routes.QR}?id=${nextDate.id}`)
-                  }
+                  onPress={() => router.push(`${Routes.QR}?id=${nextDate.id}`)}
                 >
                   <Text style={styles.detailButtonText}>Ver QR</Text>
                 </TouchableOpacity>
               </View>
             </View>
 
+            {/* Medición oculta para animar */}
+            <View
+              style={{ position: 'absolute', opacity: 0 }}
+              onLayout={e => setContentHeight(e.nativeEvent.layout.height)}
+            >
+              {allDates.map(cita => (
+                <View key={cita.id} style={{ marginBottom: 12 }}>
+                  <View style={styles.cardHeader}>
+                    <Image source={calendarioIcon} style={styles.cardIcon} />
+                    <Text style={styles.cardTitle}>{`${cita.reason} ${cita.petName}`}</Text>
+                  </View>
+                  <View style={styles.cardDateRow}>
+                    <Text style={styles.cardDate}>{`${cita.date}, ${cita.time}`}</Text>
+                    <View style={{ flexDirection: 'row' }}>
+                      <TouchableOpacity
+                        style={styles.detailButton}
+                        onPress={() => router.push(`${Routes.DetallesCita}?id=${cita.id}`)}
+                      >
+                        <Text style={styles.detailButtonText}>Detalles</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.detailButton}
+                        onPress={() => router.push(`${Routes.QR}?id=${cita.id}`)}
+                      >
+                        <Text style={styles.detailButtonText}>Ver QR</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            {/* Contenedor animado */}
             <Animated.View
               style={{
-                height: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 200] }),
-                opacity: expandAnim,
+                height: expandAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, contentHeight],
+                }),
                 overflow: 'hidden',
               }}
             >
-              <ScrollView style={{ marginTop: 12 }}>
-                {allDates.map(cita => (
-                  <View key={cita.id} style={{ marginBottom: 12 }}>
-                    <View style={styles.cardHeader}>
-                      <Image source={calendarioIcon} style={styles.cardIcon} />
-                      <Text style={styles.cardTitle}>
-                        {`${cita.reason} ${cita.petName}`}
-                      </Text>
-                    </View>
-                    <View style={styles.cardDateRow}>
-                      <Text style={styles.cardDate}>
-                        {`${cita.date}, ${cita.time}`}
-                      </Text>
-                     <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity
-                  style={styles.detailButton}
-                  onPress={() =>
-                    router.push(`${Routes.DetallesCita}?id=${nextDate.id}`)
-                  }
-                >
-                  <Text style={styles.detailButtonText}>Detalles</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.detailButton}
-                  onPress={() =>
-                    router.push(`${Routes.QR}?id=${nextDate.id}`)
-                  }
-                >
-                  <Text style={styles.detailButtonText}>Ver QR</Text>
-                </TouchableOpacity>
-              </View>
+              {allDates.map(cita => (
+                <View key={cita.id} style={{ marginBottom: 12 }}>
+                  <View style={styles.cardHeader}>
+                    <Image source={calendarioIcon} style={styles.cardIcon} />
+                    <Text style={styles.cardTitle}>{`${cita.reason} ${cita.petName}`}</Text>
+                  </View>
+                  <View style={styles.cardDateRow}>
+                    <Text style={styles.cardDate}>{`${cita.date}, ${cita.time}`}</Text>
+                    <View style={{ flexDirection: 'row' }}>
+                      <TouchableOpacity
+                        style={styles.detailButton}
+                        onPress={() => router.push(`${Routes.DetallesCita}?id=${cita.id}`)}
+                      >
+                        <Text style={styles.detailButtonText}>Detalles</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.detailButton}
+                        onPress={() => router.push(`${Routes.QR}?id=${cita.id}`)}
+                      >
+                        <Text style={styles.detailButtonText}>Ver QR</Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
-                ))}
-              </ScrollView>
+                </View>
+              ))}
             </Animated.View>
 
             <View style={styles.cardButtons}>
@@ -289,7 +313,6 @@ export default function Home() {
         )}
       </ScrollView>
 
-      {/* Tabs inferiores */}
       <BottomTabs />
     </SafeAreaView>
   );

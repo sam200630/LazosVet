@@ -19,7 +19,6 @@ import { db } from '../../../utils/FirebaseConfig';
 import { doc, updateDoc } from 'firebase/firestore';
 
 import goBackIcon   from '../../../assets/images/goBack.png';
-import logoIcon     from '../../../assets/images/logo.png';
 import editIcon     from '../../../assets/images/editar.png';
 import calendarIcon from '../../../assets/images/calendario.png';
 
@@ -95,7 +94,6 @@ export default function Mascota() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image source={logoIcon} style={styles.logo}/>
 
       <TouchableOpacity style={styles.goBack} onPress={() => router.back()}>
         <Image source={goBackIcon} style={styles.goBackIcon}/>
