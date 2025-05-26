@@ -29,7 +29,7 @@ export default StyleSheet.create({
 
   dataContainer:{
     flex:1,
-    backgroundColor:'#F0F9FF',
+    backgroundColor:'#30C5FF',
     borderTopLeftRadius:80,
     borderTopRightRadius:80,
   },
