@@ -58,7 +58,7 @@ export default function AdminHome() {
   // --- Mascotas ---
   const [allPets, setAllPets]         = useState<Pet[]>([]);
   const [loadingPets, setLoadingPets] = useState(true);
-  useContext(AuthContext); // por si necesitas userType
+  useContext(AuthContext); // para leer userType si se necesita
 
   useEffect(() => {
     const unsub = onSnapshot(
@@ -117,6 +117,11 @@ export default function AdminHome() {
   );
   const nextDate = filteredDates.length > 0 ? filteredDates[0] : null;
 
+  // Preparamos el array sin la primera para la vista expandida
+  const remainingDates = nextDate
+    ? filteredDates.slice(1)
+    : [];
+
   // Carrusel animado
   const [bannerIndex, setBannerIndex] = useState(0);
   const [direction, setDirection]     = useState<'next'|'prev'>('next');
@@ -137,7 +142,7 @@ export default function AdminHome() {
 
   // Aspect ratio dinámico
   const asset       = bannerImages[bannerIndex];
-  const { width:iw, height:ih } = Image.resolveAssetSource(asset);
+  const { width: iw, height: ih } = Image.resolveAssetSource(asset);
   const aspectRatio = iw / ih;
 
   // Toggle expansión
@@ -276,7 +281,7 @@ export default function AdminHome() {
                 {expanded && (
                   <Animated.View style={{ opacity: fadeAnim }}>
                     <ScrollView style={{ marginTop:12 }} showsVerticalScrollIndicator>
-                      {filteredDates.map(c=>(
+                      {remainingDates.map(c=>(
                         <View key={c.id} style={{ marginBottom:12 }}>
                           <View style={styles.cardHeader}>
                             <Image source={calendarioIcon} style={styles.cardIcon}/>
