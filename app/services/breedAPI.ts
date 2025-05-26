@@ -19,7 +19,7 @@ function capitalize(word: string) {
 export async function getCatBreeds(): Promise<string[]> {
   const res = await fetch('https://api.thecatapi.com/v1/breeds', {
     headers: {
-      'x-api-key': 'TU_API_KEY'
+      'x-api-key': 'live_Vjjg83XROptQ0HQswoYrdngvcpaT2PqSGkTq2hSYP608uteFIM7IYxTp01DRy6kQ'
     }
   });
   const data = await res.json();
