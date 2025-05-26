@@ -1,3 +1,5 @@
+// app/admin/home.tsx
+
 import React, {
   useEffect,
   useState,
@@ -46,26 +48,23 @@ export default function AdminHome() {
   const router = useRouter();
   const { width } = useWindowDimensions();
 
-  // Enable LayoutAnimation on Android
+  // LayoutAnimation en Android
   useEffect(() => {
     if (Platform.OS === 'android') {
       UIManager.setLayoutAnimationEnabledExperimental?.(true);
     }
   }, []);
 
-  // Todas las mascotas
-  const [allPets, setAllPets] = useState<Pet[]>([]);
+  // --- Mascotas ---
+  const [allPets, setAllPets]         = useState<Pet[]>([]);
   const [loadingPets, setLoadingPets] = useState(true);
-  const { userType } = useContext(AuthContext);
+  useContext(AuthContext); // por si necesitas userType
 
   useEffect(() => {
     const unsub = onSnapshot(
       collection(db, 'pets'),
       snap => {
-        setAllPets(snap.docs.map(d => ({
-          id: d.id,
-          ...(d.data() as any)
-        } as Pet)));
+        setAllPets(snap.docs.map(d => ({ id: d.id, ...(d.data() as any) } as Pet)));
         setLoadingPets(false);
       },
       () => setLoadingPets(false)
@@ -73,17 +72,22 @@ export default function AdminHome() {
     return () => unsub();
   }, []);
 
-  // Todas las citas
-  const [allDates, setAllDates] = useState<DateType[]>([]);
+  // --- Citas futuras sólo desde hoy ---
+  const [allDates, setAllDates]         = useState<DateType[]>([]);
   const [loadingDates, setLoadingDates] = useState(true);
   useEffect(() => {
+    const today = new Date().toISOString().slice(0,10);
     const unsub = onSnapshot(
       collection(db, 'dates'),
       snap => {
-        setAllDates(snap.docs.map(d => ({
-          id: d.id,
-          ...(d.data() as any)
-        } as DateType)));
+        const list = snap.docs
+          .map(d => ({ id: d.id, ...(d.data() as any) } as DateType))
+          .filter(d => d.date >= today)
+          .sort((a,b)=>
+            new Date(`${a.date}T${a.time}`).getTime() -
+            new Date(`${b.date}T${b.time}`).getTime()
+          );
+        setAllDates(list);
         setLoadingDates(false);
       },
       () => setLoadingDates(false)
@@ -98,37 +102,29 @@ export default function AdminHome() {
   );
 
   // Filtros de citas
-  const [dateFilter, setDateFilter] = useState(() => {
+  const [dateFilter, setDateFilter]             = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   });
-  const [showDateFilter, setShowDateFilter] = useState(false);
-
+  const [showDateFilter, setShowDateFilter]     = useState(false);
   const reasonOptions = ['Todas','Baño','Consulta','Control'];
-  const [reasonFilter, setReasonFilter] = useState('Todas');
+  const [reasonFilter, setReasonFilter]         = useState('Todas');
   const [showReasonFilter, setShowReasonFilter] = useState(false);
 
   const filteredDates = allDates.filter(d =>
     d.date === dateFilter &&
     (reasonFilter === 'Todas' || d.reason === reasonFilter)
   );
-  const nextDate = filteredDates.length > 0
-    ? filteredDates.sort((a,b)=>
-        new Date(`${a.date}T${a.time}`).getTime() -
-        new Date(`${b.date}T${b.time}`).getTime()
-      )[0]
-    : null;
+  const nextDate = filteredDates.length > 0 ? filteredDates[0] : null;
 
   // Carrusel animado
-  const [bannerIndex, setBannerIndex]     = useState(0);
-  const [direction, setDirection]         = useState<'next'|'prev'>('next');
+  const [bannerIndex, setBannerIndex] = useState(0);
+  const [direction, setDirection]     = useState<'next'|'prev'>('next');
   const slideAnim = useRef(new Animated.Value(0)).current;
-
   useEffect(() => {
     slideAnim.setValue(direction==='next'? width : -width);
     Animated.timing(slideAnim, { toValue:0, duration:500, useNativeDriver:true }).start();
   }, [bannerIndex]);
-
   useEffect(() => {
     const iv = setInterval(() => {
       setDirection('next');
@@ -136,25 +132,22 @@ export default function AdminHome() {
     },15000);
     return () => clearInterval(iv);
   }, []);
-
   const prevBanner = () => { setDirection('prev'); setBannerIndex(i=>(i-1+bannerImages.length)%bannerImages.length); };
   const nextBanner = () => { setDirection('next'); setBannerIndex(i=>(i+1)%bannerImages.length); };
 
-  // Calcular aspect ratio
-  const asset = bannerImages[bannerIndex];
-  const { width: imgW, height: imgH } = Image.resolveAssetSource(asset);
-  const aspectRatio = imgW / imgH;
+  // Aspect ratio dinámico
+  const asset       = bannerImages[bannerIndex];
+  const { width:iw, height:ih } = Image.resolveAssetSource(asset);
+  const aspectRatio = iw / ih;
 
-  // Expandir lista de citas con altura dinámica
+  // Toggle expansión
   const [expanded, setExpanded] = useState(false);
-  const expandAnim = useRef(new Animated.Value(0)).current;
-  const [contentHeight, setContentHeight] = useState(0);
-
+  const fadeAnim = useRef(new Animated.Value(0)).current;
   const toggleExpand = () => {
-    Animated.timing(expandAnim, {
-      toValue: expanded ? 0 : 1,
+    Animated.timing(fadeAnim, {
+      toValue: expanded? 0 : 1,
       duration: 300,
-      useNativeDriver: false,
+      useNativeDriver: true,
     }).start();
     setExpanded(e=>!e);
   };
@@ -165,7 +158,7 @@ export default function AdminHome() {
       <View style={styles.header}>
         <Text style={styles.title}>Admin Home</Text>
         <TouchableOpacity>
-          <Image source={notificacionesIcon} style={styles.icon} />
+          <Image source={notificacionesIcon} style={styles.icon}/>
         </TouchableOpacity>
       </View>
 
@@ -175,15 +168,15 @@ export default function AdminHome() {
           <Animated.View style={{ transform:[{ translateX: slideAnim }] }}>
             <Image
               source={asset}
-              style={[styles.bannerImage, { aspectRatio }]}
+              style={[styles.bannerImage,{ aspectRatio }]}
               resizeMode="cover"
             />
           </Animated.View>
-          <TouchableOpacity style={[styles.navButton, styles.navLeft]} onPress={prevBanner}/>
-          <TouchableOpacity style={[styles.navButton, styles.navRight]} onPress={nextBanner}/>
+          <TouchableOpacity style={[styles.navButton,styles.navLeft]} onPress={prevBanner}/>
+          <TouchableOpacity style={[styles.navButton,styles.navRight]} onPress={nextBanner}/>
           <View style={styles.dots}>
-            {bannerImages.map((_, i) => (
-              <View key={i} style={[styles.dot, i===bannerIndex && styles.dotActive]} />
+            {bannerImages.map((_,i)=>(
+              <View key={i} style={[styles.dot, i===bannerIndex&&styles.dotActive]} />
             ))}
           </View>
         </View>
@@ -196,22 +189,21 @@ export default function AdminHome() {
           placeholder="Buscar mascota..."
           style={styles.searchInput}
         />
-        {loadingPets ? (
-          <ActivityIndicator size="small" color="#30C5FF" style={{ marginVertical:16 }}/>
-        ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.petsList}>
-            {filteredPets.map(p=>(
-              <TouchableOpacity
-                key={p.id}
-                style={styles.petCard}
-                onPress={()=>router.push(`${Routes.Mascota}?id=${p.id}`)}
-              >
-                <Image source={p.photoUrl?{uri:p.photoUrl}:defaultProfile} style={styles.petPlaceholder}/>
-                <Text style={styles.petName}>{p.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        )}
+        {loadingPets
+          ? <ActivityIndicator size="small" color="#30C5FF" style={{marginVertical:16}}/>
+          : <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.petsList}>
+              {filteredPets.map(p=>(
+                <TouchableOpacity
+                  key={p.id}
+                  style={styles.petCard}
+                  onPress={()=>router.push(`${Routes.Mascota}?id=${p.id}`)}
+                >
+                  <Image source={p.photoUrl?{uri:p.photoUrl}:defaultProfile} style={styles.petPlaceholder}/>
+                  <Text style={styles.petName}>{p.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+        }
 
         {/* Próximas citas */}
         <Text style={styles.sectionTitle}>Próximas citas</Text>
@@ -240,10 +232,7 @@ export default function AdminHome() {
               />
             </View>
           )}
-          <TouchableOpacity
-            style={[styles.filterButton, styles.reasonFilter]}
-            onPress={()=>setShowReasonFilter(v=>!v)}
-          >
+          <TouchableOpacity style={[styles.filterButton,styles.reasonFilter]} onPress={()=>setShowReasonFilter(v=>!v)}>
             <Text style={styles.filterButtonText}>{reasonFilter}</Text>
           </TouchableOpacity>
           {showReasonFilter && (
@@ -265,68 +254,64 @@ export default function AdminHome() {
           )}
         </View>
 
-        {loadingDates ? (
-          <ActivityIndicator size="small" color="#30C5FF" style={{ marginVertical:16 }}/>
-        ) : nextDate ? (
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Image source={calendarioIcon} style={styles.cardIcon}/>
-              <Text style={styles.cardTitle}>{`${nextDate.reason} ${nextDate.petName}`}</Text>
-            </View>
-            <View style={styles.cardDateRow}>
-              <Text style={styles.cardDate}>{`${nextDate.date}, ${nextDate.time}`}</Text>
-              <TouchableOpacity
-                style={styles.detailButton}
-                onPress={()=>router.push(`${Routes.DetallesCita}?id=${nextDate.id}`)}
-              >
-                <Text style={styles.detailButtonText}>Detalles</Text>
-              </TouchableOpacity>
-            </View>
+        {loadingDates
+          ? <ActivityIndicator size="small" color="#30C5FF" style={{marginVertical:16}}/>
+          : nextDate ? (
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Image source={calendarioIcon} style={styles.cardIcon}/>
+                  <Text style={styles.cardTitle}>{`${nextDate.reason} ${nextDate.petName}`}</Text>
+                </View>
+                <View style={styles.cardDateRow}>
+                  <Text style={styles.cardDate}>{`${nextDate.date}, ${nextDate.time}`}</Text>
+                  <TouchableOpacity
+                    style={styles.detailButton}
+                    onPress={()=>router.push(`${Routes.DetallesCita}?id=${nextDate.id}`)}
+                  >
+                    <Text style={styles.detailButtonText}>Detalles</Text>
+                  </TouchableOpacity>
+                </View>
 
-            {/* Expandible */}
-            <Animated.View style={{
-              height: expandAnim.interpolate({ inputRange:[0,1], outputRange:[0, contentHeight] }),
-              opacity: expandAnim,
-              overflow:'hidden',
-            }}>
-              <View
-                onLayout={e=>setContentHeight(e.nativeEvent.layout.height)}
-              >
-                {filteredDates.map(c=>(
-                  <View key={c.id} style={{ marginBottom:12 }}>
-                    <View style={styles.cardHeader}>
-                      <Image source={calendarioIcon} style={styles.cardIcon}/>
-                      <Text style={styles.cardTitle}>{`${c.reason} ${c.petName}`}</Text>
-                    </View>
-                    <View style={styles.cardDateRow}>
-                      <Text style={styles.cardDate}>{`${c.date}, ${c.time}`}</Text>
-                      <TouchableOpacity
-                        style={styles.detailButton}
-                        onPress={()=>router.push(`${Routes.DetallesCita}?id=${c.id}`)}
-                      >
-                        <Text style={styles.detailButtonText}>Detalles</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                ))}
+                {/* Expandible: lista scrollable */}
+                {expanded && (
+                  <Animated.View style={{ opacity: fadeAnim }}>
+                    <ScrollView style={{ marginTop:12 }} showsVerticalScrollIndicator>
+                      {filteredDates.map(c=>(
+                        <View key={c.id} style={{ marginBottom:12 }}>
+                          <View style={styles.cardHeader}>
+                            <Image source={calendarioIcon} style={styles.cardIcon}/>
+                            <Text style={styles.cardTitle}>{`${c.reason} ${c.petName}`}</Text>
+                          </View>
+                          <View style={styles.cardDateRow}>
+                            <Text style={styles.cardDate}>{`${c.date}, ${c.time}`}</Text>
+                            <TouchableOpacity
+                              style={styles.detailButton}
+                              onPress={()=>router.push(`${Routes.DetallesCita}?id=${c.id}`)}
+                            >
+                              <Text style={styles.detailButtonText}>Detalles</Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      ))}
+                    </ScrollView>
+                  </Animated.View>
+                )}
+
+                <View style={styles.cardButtons}>
+                  <TouchableOpacity
+                    style={styles.cardButton}
+                    onPress={()=>router.push(Routes.AdminAddCita)}
+                  >
+                    <Text style={styles.cardButtonText}>+ Añadir cita</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.cardButton} onPress={toggleExpand}>
+                    <Text style={styles.cardButtonText}>{expanded?'Ocultar':'Ver todos'}</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </Animated.View>
-
-            <View style={styles.cardButtons}>
-              <TouchableOpacity
-                style={styles.cardButton}
-                onPress={()=>router.push(Routes.AdminAddCita)}
-              >
-                <Text style={styles.cardButtonText}>+ Añadir cita</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.cardButton} onPress={toggleExpand}>
-                <Text style={styles.cardButtonText}>{expanded?'Ocultar':'Ver todos'}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ) : (
-          <Text style={{ marginHorizontal:16, color:'#666' }}>No hay citas.</Text>
-        )}
+            )
+            : <Text style={{marginHorizontal:16,color:'#666'}}>No hay citas.</Text>
+        }
       </ScrollView>
 
       {/* Tabs inferiores */}
