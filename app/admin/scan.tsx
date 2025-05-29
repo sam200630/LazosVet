@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
+
+// Importing necessary components and hooks from Expo and React
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import { Routes } from '../../route';
@@ -18,8 +20,8 @@ export default function AdminScan() {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const router = useRouter();
-  const cameraRef = useRef(null);
-
+  
+  // Request camera permission on component mount
   useEffect(() => {
     if (!permission) {
       requestPermission();

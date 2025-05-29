@@ -127,13 +127,13 @@ export default function AddAppointment() {
         date,
         time,
       });
-      // ← CAMBIO: navegamos a la pantalla QR con ?id=newId
+      
       router.replace(`${Routes.QR}?id=${newId}`);
     } catch (e) {
       console.error(e);
       setErrorMsg('No se pudo agendar la cita. Intenta de nuevo.');
     } finally {
-      setLoading(false);                                     // ← CAMBIO: ocultamos loader
+      setLoading(false);                                    
     }
   };
 
@@ -150,24 +150,24 @@ export default function AddAppointment() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={styles.form}>
-        {/* Flecha atrás */}
+        {/* go back */}
         <TouchableOpacity style={styles.goBack} onPress={() => router.back()}>
           <Image source={goBackIcon} style={styles.goBackIcon} />
         </TouchableOpacity>
 
-        {/* Huella grande */}
+        {/* footprint */}
         <Image source={pawIcon} style={styles.paw} />
 
         <Text style={styles.title}>Añadir cita</Text>
 
-        {/* Banner de error */}
+        {/* Banner error */}
         {errorMsg ? (
           <View style={styles.errorBanner}>
             <Text style={styles.errorText}>{errorMsg}</Text>
           </View>
         ) : null}
 
-        {/* Mascota */}
+        {/* Pet */}
         <Text style={styles.label}>Mascota</Text>
         <View style={styles.selectorWrapper}>
           <TouchableOpacity
@@ -202,7 +202,7 @@ export default function AddAppointment() {
           )}
         </View>
 
-        {/* Motivo */}
+        {/* Reason */}
         <Text style={styles.label}>Motivo de la cita</Text>
         <View style={styles.selectorWrapper}>
           <TouchableOpacity
@@ -233,7 +233,7 @@ export default function AddAppointment() {
           )}
         </View>
 
-        {/* Recomendaciones */}
+        {/* Recomendations*/}
         <Text style={styles.label}>Recomendaciones adicionales</Text>
         <TextInput
           style={[styles.input, styles.extraInput]}
@@ -245,7 +245,7 @@ export default function AddAppointment() {
           value={extra}
         />
 
-        {/* Fecha */}
+        {/* Date */}
         <Text style={styles.label}>Fecha</Text>
         <View style={styles.calendarWrapper}>
           <TouchableOpacity
@@ -276,7 +276,7 @@ export default function AddAppointment() {
           )}
         </View>
 
-        {/* Hora */}
+        {/* Hour */}
         <Text style={styles.label}>Horario de 8:00am-5:30pm</Text>
         <View style={styles.selectorWrapper}>
           <TouchableOpacity
@@ -315,13 +315,13 @@ export default function AddAppointment() {
           )}
         </View>
 
-        {/* Botón */}
+        {/* Button */}
         <TouchableOpacity
-          style={[styles.button, (!isValid || loading) && styles.buttonDisabled]} // ← CAMBIO: también deshabilita si loading
-          disabled={!isValid || loading}                                       // ← CAMBIO
+          style={[styles.button, (!isValid || loading) && styles.buttonDisabled]} 
+          disabled={!isValid || loading}                                       
           onPress={handleDate}
         >
-          {loading ? (                             // ← CAMBIO: mostramos loader
+          {loading ? (                             
             <ActivityIndicator color="#FFF" />
           ) : (
             <Text style={styles.buttonText}>Generar confirmación</Text>
@@ -329,7 +329,7 @@ export default function AddAppointment() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Bottom Tabs */}
+      {/* Tabs */}
       <BottomTabs />
     </KeyboardAvoidingView>
   );

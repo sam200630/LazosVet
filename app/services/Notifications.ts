@@ -4,7 +4,7 @@ import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { SchedulableTriggerInputTypes } from 'expo-notifications';
 
-// Handler para notificaciones en primer plano
+// Handler notifications
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert:  true,
@@ -15,9 +15,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-/**
- * Inicializa permisos y canal Android
- */
+// Initialize notifications
 export async function initNotifications() {
   const { status } = await Notifications.getPermissionsAsync();
   if (status !== 'granted') {
@@ -35,7 +33,7 @@ export async function initNotifications() {
   }
 }
 
-// cambiar a 24h mañana
+// Schedule a test reminder notification
 export async function scheduleReminder(petName: string, reason: string
 ): Promise<string> {
   const id = await Notifications.scheduleNotificationAsync({

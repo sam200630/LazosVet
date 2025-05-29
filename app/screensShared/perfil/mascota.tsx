@@ -37,7 +37,7 @@ export default function Mascota() {
 
   const [editingField, setEditingField] = useState<Field>(null);
   const [editingValue, setEditingValue] = useState('');
-
+// Fetch pet data from context or Firebase
   useEffect(() => {
     
       const fetchPet = async () => {
@@ -64,7 +64,7 @@ export default function Mascota() {
       if (!petsLoading) fetchPet();
 }, [petsLoading, petId]);
 
-
+ // Calculate next appointment based on dates context
   useEffect(() => {
     if (!pet || datesLoading) return setNextAppointment(null);
     const now = new Date();
@@ -82,6 +82,8 @@ export default function Mascota() {
     }
   }, [pet, dates, datesLoading]);
 
+
+ // Start editing a field
   const startEdit = (field: Field, current: string) => {
     setEditingField(field);
     setEditingValue(current);
@@ -132,7 +134,7 @@ export default function Mascota() {
       </View>
 
       <ScrollView style={styles.dataContainer} contentContainerStyle={styles.dataContent}>
-        {/* Raza */}
+        {/* breed */}
         <View style={styles.fieldRow}>
           <Text style={styles.label}>Raza</Text>
           {editingField==='breed'
@@ -155,7 +157,7 @@ export default function Mascota() {
           </View>
         )}
 
-        {/* Edad */}
+        {/* age */}
         <View style={styles.fieldRow}>
           <Text style={styles.label}>Edad</Text>
           {editingField==='age'
@@ -179,7 +181,7 @@ export default function Mascota() {
           </View>
         )}
 
-        {/* Peso */}
+        {/* weight */}
         <View style={styles.fieldRow}>
           <Text style={styles.label}>Peso</Text>
           {editingField==='weight'
@@ -203,7 +205,7 @@ export default function Mascota() {
           </View>
         )}
 
-        {/* Condiciones */}
+        {/* Conditions */}
         <Text style={[styles.label,styles.sectionSeparator]}>Condiciones</Text>
         <View style={styles.conditionsBox}>
           <View style={styles.fieldRow}>
@@ -229,7 +231,7 @@ export default function Mascota() {
           )}
         </View>
 
-        {/* Próxima cita */}
+        {/* next date */}
         <Text style={[styles.label,styles.sectionSeparator]}>Próxima cita</Text>
         {nextAppointment
           ? (

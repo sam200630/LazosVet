@@ -16,6 +16,7 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+
 import { useRouter } from 'expo-router';
 import { MediaContext, MediaPost } from '../../../context/mediaContext';
 import BottomTabs from '../../../components/bottonsTab';
@@ -28,7 +29,7 @@ import { Routes }  from '../../../route';
 import defaultAvatar from '../../../assets/images/default-profile.jpeg';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../../../utils/FirebaseConfig';
-
+//
 interface PostWithUser extends MediaPost {
   userName: string;
   userPhoto: string | null;
@@ -145,12 +146,13 @@ export default function MediaPrincipal() {
         ))}
       </ScrollView>
 
-      {/* Bottom Tabs */}
+      {/* Tabs */}
       <BottomTabs />
     </SafeAreaView>
   );
 }
 
+// PostItem component
 function PostItem({
   post,
   liked,

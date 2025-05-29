@@ -28,12 +28,6 @@ import correoIcon   from '../../../assets/images/correo.png';
 import pawSmallIcon from '../../../assets/images/mascota.png';
 import editIcon     from '../../../assets/images/editar.png';
 import trashIcon    from '../../../assets/images/basura.png';
-// Iconos de tabs (se conservan aunque no se usen aquí)
-import homeIcon     from '../../../assets/images/home.png';
-import petbotIcon   from '../../../assets/images/petbot.png';
-import mediaIcon    from '../../../assets/images/media.png';
-import perfilIcon   from '../../../assets/images/perfil.png';
-
 import { Routes } from '../../../route';
 
 export default function Perfil() {
@@ -45,7 +39,7 @@ export default function Perfil() {
   const [modalVisible, setModalVisible] = useState(false);
   const [uploading, setUploading]       = useState(false);
 
-  // Sube foto...
+  // upload photo...
   const uploadToStorage = async (localUri: string) => {
     try {
       setUploading(true);
@@ -105,7 +99,7 @@ export default function Perfil() {
     );
   }
 
-  // Determina la ruta de home según userType
+  // redirect back based on user type
   const handleGoBack = () => {
     if (userType === 'admin') {
       router.replace(Routes.AdminHome);
@@ -122,7 +116,7 @@ export default function Perfil() {
         closeModal={() => setModalVisible(false)}
       />
 
-      {/* Botón atrás con redirección condicional */}
+      {/* button back with condition */}
       <TouchableOpacity style={styles.goBack} onPress={handleGoBack}>
         <Image source={goBackIcon} style={styles.goBackIcon} />
       </TouchableOpacity>
@@ -142,7 +136,7 @@ export default function Perfil() {
           </TouchableOpacity>
         </View>
 
-        {/* Foto de perfil */}
+        {/* profile photo */}
         <View style={styles.profilePicContainer}>
           <Image
             source={ photoUrl
@@ -153,7 +147,7 @@ export default function Perfil() {
           />
         </View>
 
-        {/* Información personal */}
+        {/* Personal information */}
         <Text style={styles.sectionTitle}>Información personal</Text>
         <View style={styles.infoCard}>
           <View style={styles.infoItem}>
@@ -166,7 +160,7 @@ export default function Perfil() {
           </View>
         </View>
 
-        {/* Listado de mascotas */}
+        {/* Pets list */}
         <Text style={styles.sectionTitle}>Mis mascotas</Text>
         <View style={styles.petsCard}>
           {pets.length > 0
@@ -175,14 +169,14 @@ export default function Perfil() {
                   <Image source={pawSmallIcon} style={styles.petRowIcon} />
                   <Text style={styles.petName}>{p.name}</Text>
 
-                  {/* Editar mascota */}
+                  {/* Edit pets */}
                   <TouchableOpacity
                     onPress={() => router.push(`${Routes.EditMascota}?id=${p.id}`)}
                   >
                     <Image source={editIcon} style={styles.editIcon} />
                   </TouchableOpacity>
 
-                  {/* Borrar mascota */}
+                  {/* delete pet */}
                   <TouchableOpacity onPress={() => confirmDelete(p.id)}>
                     <Image source={trashIcon} style={styles.editIcon} />
                   </TouchableOpacity>
@@ -192,7 +186,7 @@ export default function Perfil() {
           }
         </View>
 
-        {/* Botones de acción */}
+        {/* action buttons */}
         <TouchableOpacity style={styles.addPetButton} onPress={() => router.replace(Routes.AddMascota)}>
           <Text style={styles.addPetText}>+ Añadir mascota</Text>
         </TouchableOpacity>
@@ -202,7 +196,7 @@ export default function Perfil() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Tab bar */}
+      {/* Tabs*/}
       <BottomTabs />
     </SafeAreaView>
   );

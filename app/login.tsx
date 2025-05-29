@@ -16,7 +16,7 @@ import { Routes } from '../route';
 
 export default function Login() {
   const router = useRouter();
-  const { login } = useContext(AuthContext);
+  const { login, userType } = useContext(AuthContext); // Asegúrate de que user esté disponible en el AuthContext
 
   const [username, setUsername]         = useState('');
   const [password, setPassword]         = useState('');
@@ -35,8 +35,14 @@ export default function Login() {
     }
 
     try {
+    
       await login(username.trim(), password);
-      
+      if (userType === 'admin') {
+        router.replace(Routes.AdminHome);
+      } else {
+        router.replace(Routes.Home);
+      }
+
     } catch (error: any) {
       let message = 'Correo o contraseña inválidos.';
       switch (error.code) {
@@ -56,6 +62,7 @@ export default function Login() {
       setErrorMessage(message);
     }
   };
+
 
   return (
     <KeyboardAvoidingView

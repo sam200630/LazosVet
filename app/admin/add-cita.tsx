@@ -1,5 +1,4 @@
 // app/citas/AddAppointment.tsx
-
 import React, { useState, useMemo, useContext, useEffect } from 'react';
 import {
   View,
@@ -12,6 +11,8 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
+
+// Importing necessary components and hooks
 import { useRouter } from 'expo-router';
 import { Routes } from '../../route';
 import styles from '../../styles/citas/add_cita';
@@ -24,9 +25,10 @@ import {
   addDoc,
   serverTimestamp,
 } from 'firebase/firestore';
+
+// Importing components from react-native-calendars and other assets
 import { Calendar } from 'react-native-calendars';
 import BottomTabs from '../../components/bottonsTab';
-
 import goBackIcon from '../../assets/images/goBack.png';
 import pawIcon from '../../assets/images/huellaGrande.png';
 import homeIcon from '../../assets/images/home.png';
@@ -38,6 +40,7 @@ import expanderIcon from '../../assets/images/expander.png';
 type Client = { id: string; name: string };
 
 export default function AddAppointment() {
+  
   const router = useRouter();
   const { dates } = useContext(DatesContext);
   const { getAllPets } = useContext(PetsContext);
@@ -63,7 +66,8 @@ export default function AddAppointment() {
   const [showReasonDropdown, setShowReasonDropdown] = useState(false);
   const [showDateCalendar, setShowDateCalendar] = useState(false);
   const [showTimeDropdown, setShowTimeDropdown] = useState(false);
-
+  const reasonOptions = ['Baño', 'Consulta', 'Control'];
+// Fetching clients from Firestore when the component mounts
   useEffect(() => {
     (async () => {
       try {
@@ -81,6 +85,7 @@ export default function AddAppointment() {
     })();
   }, []);
 
+  // Fetching pets for the selected client when clientId changes
   useEffect(() => {
     if (!clientId) {
       setClientPets([]);
@@ -101,8 +106,8 @@ export default function AddAppointment() {
     })();
   }, [clientId]);
 
-  const reasonOptions = ['Baño', 'Consulta', 'Control'];
-
+  
+ // Generating time options from 8:00 to 17:30
   const timeOptions = useMemo(() => {
     const arr: string[] = [];
     for (let h = 8; h <= 17; h++) {
@@ -114,6 +119,8 @@ export default function AddAppointment() {
     return arr;
   }, []);
 
+
+// Filtering time options based on selected date and reason
   const filteredTimeOptions = timeOptions.map(t => {
     const conflict = dates.some(d =>
       d.date === date &&
@@ -139,6 +146,7 @@ export default function AddAppointment() {
   const dd   = String(today.getDate()).padStart(2,'0');
   const minDate = `${yyyy}-${mm}-${dd}`;
 
+// Function to handle date submission
   const handleDate = async () => {
     setErrorMsg('');
     if (filteredTimeOptions.find(o => o.time === time && o.disabled)) {

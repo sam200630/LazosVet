@@ -19,7 +19,7 @@ import BottomTabs from '../../../components/bottonsTab';
 import { getDogBreeds, getCatBreeds } from '../../services/breedAPI';
 
 
-// íconos...
+// ícons
 import goBackIcon    from '../../../assets/images/goBack.png';
 import expanderIcon  from '../../../assets/images/expander.png';
 
@@ -59,9 +59,9 @@ export default function AddMascota() {
 
   const handleSubmit = async () => {
     await addPet({
-      userId: 'user123', // TODO: replace with actual user ID
+      userId: 'user123', //  replace with actual user ID
       name,
-      animalType: species, // TODO: set the correct animal type value
+      animalType: species, // set the correct animal type value
       breed,
       gender,
       age: parseInt(age, 10),
@@ -105,7 +105,7 @@ export default function AddMascota() {
       <ScrollView contentContainerStyle={{ paddingBottom: TAB_BAR_HEIGHT + 24 }}>
         <Text style={styles.title}>Añadir mascota</Text>
 
-        {/* Foto mascota */}
+        {/* Pets photo */}
         <View style={styles.profilePicContainer}>
           {photoUri ? (
             <Image source={{ uri: photoUri }} style={styles.profilePic} />
@@ -120,9 +120,9 @@ export default function AddMascota() {
           </TouchableOpacity>
         </View>
 
-        {/* Formulario */}
+        {/* Forms */}
         <View style={styles.form}>
-          {/* Nombre */}
+          {/* Name */}
           <Text style={styles.label}>Nombre</Text>
           <TextInput
             style={styles.input}
@@ -131,7 +131,7 @@ export default function AddMascota() {
             value={name}
             onChangeText={setName}
           />
-            {/* Especie */}
+            {/* species */}
           <Text style={styles.label}>Especie</Text>
           <View style={styles.selectorWrapper}>
             <TouchableOpacity
@@ -203,7 +203,7 @@ export default function AddMascota() {
 
         
 
-          {/* Género */}
+          {/* Gender */}
           <Text style={styles.label}>Género</Text>
           <View style={styles.selectorWrapper}>
             <TouchableOpacity
@@ -233,7 +233,7 @@ export default function AddMascota() {
             )}
           </View>
 
-          {/* Edad */}
+          {/* Age*/}
           <Text style={styles.label}>Edad</Text>
           <View style={styles.ageRow}>
             <TextInput
@@ -273,7 +273,7 @@ export default function AddMascota() {
             </View>
           </View>
 
-          {/* Peso */}
+          {/* weight*/}
           <Text style={styles.label}>Peso (kg)</Text>
           <TextInput
             style={styles.input}
@@ -284,7 +284,7 @@ export default function AddMascota() {
             onChange={handleWeightChange}
           />
 
-          {/* Condiciones */}
+          {/* Conditions */}
           <Text style={styles.label}>Condiciones de salud</Text>
           <TextInput
             style={[styles.input, styles.extraInput]}
@@ -306,7 +306,7 @@ export default function AddMascota() {
         </View>
       </ScrollView>
 
-      {/* Tab bar */}
+      {/* Tabs*/}
       <BottomTabs />
     </SafeAreaView>
   );

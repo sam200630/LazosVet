@@ -20,6 +20,8 @@ import {
   UIManager,
   TextInput,
 } from 'react-native';
+
+// import the necessary components and utilities
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../utils/FirebaseConfig';
@@ -31,10 +33,7 @@ import { Calendar } from 'react-native-calendars';
 import { AuthContext } from '../../context/AuthContext';
 import BottomTabs from '../../components/bottonsTab';
 
-import homeIcon           from '../../assets/images/home.png';
-import scanIcon           from '../../assets/images/escanear.png';
-import mediaIcon          from '../../assets/images/media.png';
-import perfilIcon         from '../../assets/images/perfil.png';
+
 import notificacionesIcon from '../../assets/images/notificaciones.png';
 import defaultProfile     from '../../assets/images/default-profile.jpeg';
 import calendarioIcon     from '../../assets/images/calendario.png';
@@ -48,14 +47,14 @@ export default function AdminHome() {
   const router = useRouter();
   const { width } = useWindowDimensions();
 
-  // LayoutAnimation en Android
+  // LayoutAnimation in Android
   useEffect(() => {
     if (Platform.OS === 'android') {
       UIManager.setLayoutAnimationEnabledExperimental?.(true);
     }
   }, []);
 
-  // --- Mascotas ---
+  // --- pets ---
   const [allPets, setAllPets]         = useState<Pet[]>([]);
   const [loadingPets, setLoadingPets] = useState(true);
   useContext(AuthContext); // para leer userType si se necesita
@@ -72,7 +71,7 @@ export default function AdminHome() {
     return () => unsub();
   }, []);
 
-  // --- Citas futuras sólo desde hoy ---
+  // --- dates ---
   const [allDates, setAllDates]         = useState<DateType[]>([]);
   const [loadingDates, setLoadingDates] = useState(true);
   useEffect(() => {
@@ -95,13 +94,13 @@ export default function AdminHome() {
     return () => unsub();
   }, []);
 
-  // Búsqueda de mascotas
+  // searching pets
   const [searchText, setSearchText] = useState('');
   const filteredPets = allPets.filter(p =>
     p.name.toLowerCase().includes(searchText.trim().toLowerCase())
   );
 
-  // Filtros de citas
+  // Date and reason filters
   const [dateFilter, setDateFilter]             = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -117,12 +116,13 @@ export default function AdminHome() {
   );
   const nextDate = filteredDates.length > 0 ? filteredDates[0] : null;
 
-  // Preparamos el array sin la primera para la vista expandida
+  // Remaining dates after the next one
+  // (to show in the expandable list)
   const remainingDates = nextDate
     ? filteredDates.slice(1)
     : [];
 
-  // Carrusel animado
+  // banner carousel
   const [bannerIndex, setBannerIndex] = useState(0);
   const [direction, setDirection]     = useState<'next'|'prev'>('next');
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -140,12 +140,12 @@ export default function AdminHome() {
   const prevBanner = () => { setDirection('prev'); setBannerIndex(i=>(i-1+bannerImages.length)%bannerImages.length); };
   const nextBanner = () => { setDirection('next'); setBannerIndex(i=>(i+1)%bannerImages.length); };
 
-  // Aspect ratio dinámico
+  // Aspect ratio display
   const asset       = bannerImages[bannerIndex];
   const { width: iw, height: ih } = Image.resolveAssetSource(asset);
   const aspectRatio = iw / ih;
 
-  // Toggle expansión
+  // Toggle expantion of the next dates list
   const [expanded, setExpanded] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const toggleExpand = () => {

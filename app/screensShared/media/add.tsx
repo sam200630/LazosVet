@@ -15,7 +15,6 @@ import { useRouter } from 'expo-router';
 import styles from '../../../styles/media/add';
 import goBackIcon  from '../../../assets/images/goBack.png';
 import camaraIcon  from '../../../assets/images/camara.png';
-import imagenIcon  from '../../../assets/images/foto.png';
 import { Routes }  from '../../../route';
 import BottomTabs   from '../../../components/bottonsTab';
 import { MediaContext } from '../../../context/mediaContext';
@@ -45,7 +44,7 @@ export default function AddMedia() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Cámara/Galería Modal */}
+      {/* Galery modal */}
       <CameraModal
         isVisible={modalVisible}
         setImage={img => {
@@ -54,14 +53,14 @@ export default function AddMedia() {
         closeModal={() => setModalVisible(false)}
       />
 
-      {/* ← Atrás */}
+      {/* ← back */}
       <TouchableOpacity style={styles.goBack} onPress={() => router.back()}>
         <Image source={goBackIcon} style={styles.goBackIcon} />
       </TouchableOpacity>
 
       <Text style={styles.title}>Añadir publicación</Text>
 
-      {/* Botones cámara / galería */}
+      {/* Buttons camera and gallery */}
       <View style={styles.iconsRow}>
         <TouchableOpacity
           style={styles.iconButton}
@@ -72,7 +71,7 @@ export default function AddMedia() {
         </TouchableOpacity>
       </View>
 
-      {/* Vista previa */}
+      {/* preview */}
       {imageUri && (
         <Image
           source={{ uri: imageUri }}
@@ -81,7 +80,7 @@ export default function AddMedia() {
         />
       )}
 
-      {/* Descripción */}
+      {/* Description */}
       <Text style={styles.label}>Descripcion</Text>
       <TextInput
         style={styles.input}
@@ -93,7 +92,7 @@ export default function AddMedia() {
         onChangeText={setDescription}
       />
 
-      {/* Publicar / Cancelar */}
+      {/* Publish / cancel */}
       <View style={styles.buttonsRow}>
         <TouchableOpacity
           style={styles.publishButton}
@@ -109,7 +108,7 @@ export default function AddMedia() {
         </TouchableOpacity>
       </View>
 
-      {/* Tabs inferiores */}
+      {/* Tabs  */}
       <BottomTabs />
     </SafeAreaView>
   );

@@ -79,7 +79,7 @@ export default function EditMascota() {
     if (!pet) return;
     setLoading(true);
     try {
-      // 1) Si hay nueva foto, subirla primero
+      // 1) If photoUri is set, upload to Firebase Storage
       let photoUrl: string | undefined;
       if (photoUri) {
         const resp = await fetch(photoUri);
@@ -89,7 +89,7 @@ export default function EditMascota() {
         await uploadBytes(storageRef, blob);
         photoUrl = await getDownloadURL(storageRef);
       }
-      // 2) Actualizar Firestore
+      // 2)update Firestore document
       const data: any = {
         name: name.trim(),
         breed: breed.trim(),
@@ -139,7 +139,7 @@ export default function EditMascota() {
       <ScrollView contentContainerStyle={{ paddingBottom: TAB_BAR_HEIGHT + 24 }}>
         <Text style={styles.title}>Editar mascota</Text>
 
-        {/* Foto */}
+        {/* photo */}
         <View style={styles.profilePicContainer}>
           {photoUri
             ? <Image source={{ uri: photoUri }} style={styles.profilePic}/>
