@@ -59,6 +59,7 @@ export default function AddMascota() {
 
   const handleSubmit = async () => {
     await addPet({
+      userId: 'user123', // TODO: replace with actual user ID
       name,
       animalType: species, // TODO: set the correct animal type value
       breed,

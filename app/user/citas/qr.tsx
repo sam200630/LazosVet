@@ -1,6 +1,6 @@
 // app/citas/qr.tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -18,11 +18,12 @@ import QRCode from 'react-native-qrcode-svg';   // ← CAMBIO: importamos el com
 import { doc, getDoc } from 'firebase/firestore'; // ← CAMBIO: para leer la cita
 import { db } from '../../../utils/FirebaseConfig';
 import { DateType } from '../../../context/DatesContext';
-
+import { AuthContext } from '../../../context/AuthContext';
 export default function QR() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();      // ← CAMBIO: leemos el parámetro
   const [cita, setCita] = useState<DateType | null>(null);
+  const { userType } = useContext(AuthContext);
 
   useEffect(() => {
     if (!id) return;
@@ -35,6 +36,14 @@ export default function QR() {
       }
     })();
   }, [id]);
+
+  const handleConfirm = () => {
+      if (userType === 'admin') {
+        router.replace(Routes.AdminHome);
+      } else {
+        router.replace(Routes.Home);
+      }
+    };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -55,7 +64,7 @@ export default function QR() {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.replace(Routes.Home)}
+            onPress={handleConfirm}
           >
             <Image source={goBackIcon} style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Cerrar</Text>

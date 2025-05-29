@@ -16,10 +16,9 @@ import styles from '../../../styles/perfil/mascota';
 import { PetsContext, Pet } from '../../../context/PetsContext';
 import { DatesContext } from '../../../context/DatesContext';
 import { db } from '../../../utils/FirebaseConfig';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 import goBackIcon   from '../../../assets/images/goBack.png';
-import logoIcon     from '../../../assets/images/logo.png';
 import editIcon     from '../../../assets/images/editar.png';
 import calendarIcon from '../../../assets/images/calendario.png';
 
@@ -40,10 +39,31 @@ export default function Mascota() {
   const [editingValue, setEditingValue] = useState('');
 
   useEffect(() => {
-    if (!petsLoading) {
-      setPet(pets.find(p => p.id === petId) || null);
-    }
-  }, [pets, petsLoading]);
+    
+      const fetchPet = async () => {
+        if (!petId) return;
+        const fromContext = pets.find(p => p.id === petId);
+        if (fromContext) {
+          setPet(fromContext);
+        } else {
+          try {
+            const docRef = doc(db, 'pets', petId);
+            const snap = await getDoc(docRef);
+            if (snap.exists()) {
+              const data = snap.data();
+              setPet({ id: snap.id, ...data } as Pet);
+            } else {
+              setPet(null);
+            }
+          } catch (e) {
+            console.error('Error al cargar mascota desde Firebase:', e);
+            setPet(null);
+          }
+        }
+      };
+      if (!petsLoading) fetchPet();
+}, [petsLoading, petId]);
+
 
   useEffect(() => {
     if (!pet || datesLoading) return setNextAppointment(null);
@@ -95,7 +115,6 @@ export default function Mascota() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image source={logoIcon} style={styles.logo}/>
 
       <TouchableOpacity style={styles.goBack} onPress={() => router.back()}>
         <Image source={goBackIcon} style={styles.goBackIcon}/>

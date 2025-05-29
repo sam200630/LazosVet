@@ -31,11 +31,32 @@ export default StyleSheet.create({
   },
   bannerImage: {
     width:'100%',
-    height:160,
+    height: undefined,    // altura proporcional
     borderRadius:12,
   },
   navButton:{ position:'absolute', top:0, bottom:0, width:'50%' },
   navLeft:{ left:0 }, navRight:{ right:0 },
+
+  // Dots del carrusel
+  dots: {
+    position:'absolute',
+    bottom:8,
+    width:'100%',
+    flexDirection:'row',
+    justifyContent:'center',
+  },
+  dot: {
+    width:8,
+    height:8,
+    borderRadius:4,
+    backgroundColor:'#DDD',
+    marginHorizontal:4,
+  },
+  dotActive: {
+    width:12,
+    height:12,
+    backgroundColor:'#A15E49',
+  },
 
   // Título sección mascotas
   sectionTitle: {

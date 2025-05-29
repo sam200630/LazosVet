@@ -1,6 +1,6 @@
-// app/user/perfil.tsx
-import PerfilScreen from '../screensShared/perfil/perfil';
+  // app/user/perfil.tsx
+  import PerfilScreen from '../screensShared/perfil/perfil';
 
-export default function UserPerfilWrapper() {
-  return <PerfilScreen />;
-}
+  export default function UserPerfilWrapper() {
+    return <PerfilScreen />;
+  }

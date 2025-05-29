@@ -16,65 +16,63 @@ import { useRouter } from 'expo-router';
 import { Routes } from '../../route';
 import styles from '../../styles/citas/add_cita';
 import { DatesContext } from '../../context/DatesContext';
+import { PetsContext } from '../../context/PetsContext';
 import { db } from '../../utils/FirebaseConfig';
 import {
   collection,
-  query,
-  where,
-  onSnapshot,
   getDocs,
   addDoc,
   serverTimestamp,
 } from 'firebase/firestore';
-
-// Imports estáticos
-import goBackIcon   from '../../assets/images/goBack.png';
-import pawIcon      from '../../assets/images/huellaGrande.png';
-import homeIcon     from '../../assets/images/home.png';
-import scanIcon   from '../../assets/images/escanear.png';
-import mediaIcon    from '../../assets/images/media.png';
-import perfilIcon   from '../../assets/images/perfil.png';
-import expanderIcon from '../../assets/images/expander.png';
-
-// Calendario
 import { Calendar } from 'react-native-calendars';
 import BottomTabs from '../../components/bottonsTab';
 
+import goBackIcon from '../../assets/images/goBack.png';
+import pawIcon from '../../assets/images/huellaGrande.png';
+import homeIcon from '../../assets/images/home.png';
+import scanIcon from '../../assets/images/escanear.png';
+import mediaIcon from '../../assets/images/media.png';
+import perfilIcon from '../../assets/images/perfil.png';
+import expanderIcon from '../../assets/images/expander.png';
+
+type Client = { id: string; name: string };
+
 export default function AddAppointment() {
   const router = useRouter();
-  const { dates, addDate } = useContext(DatesContext);
+  const { dates } = useContext(DatesContext);
+  const { getAllPets } = useContext(PetsContext);
 
-  // CLIENTES
-  const [clients, setClients]               = useState<string[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [clientId, setClientId] = useState('');
+  const [client, setClient] = useState('');
   const [loadingClients, setLoadingClients] = useState(true);
-  const [client, setClient]                 = useState<string>('');
   const [showClientDropdown, setShowClientDropdown] = useState(false);
 
-  // MASCOTAS (filtradas por cliente)
-  const [clientPets, setClientPets]           = useState<string[]>([]);
+  const [clientPets, setClientPets] = useState<string[]>([]);
   const [loadingClientPets, setLoadingClientPets] = useState(false);
-  const [pet, setPet]                         = useState<string>('');
+  const [pet, setPet] = useState('');
   const [showPetDropdown, setShowPetDropdown] = useState(false);
 
-  // Resto del formulario
   const [reason, setReason] = useState('');
-  const [extra, setExtra]   = useState('');
-  const [date, setDate]     = useState('');
-  const [time, setTime]     = useState('');
+  const [extra, setExtra] = useState('');
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const [loading, setLoading]   = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // Mostrar calendarios / dropdowns
   const [showReasonDropdown, setShowReasonDropdown] = useState(false);
-  const [showDateCalendar, setShowDateCalendar]     = useState(false);
-  const [showTimeDropdown, setShowTimeDropdown]     = useState(false);
+  const [showDateCalendar, setShowDateCalendar] = useState(false);
+  const [showTimeDropdown, setShowTimeDropdown] = useState(false);
 
-  // 1) CARGAR CLIENTES
   useEffect(() => {
     (async () => {
       try {
         const snap = await getDocs(collection(db, 'users'));
-        setClients(snap.docs.map(d => (d.data().name as string)));
+        const list = snap.docs.map(d => {
+          const data = d.data();
+          return { id: d.id, name: data.name } as Client;
+        });
+        setClients(list);
       } catch (e) {
         console.error(e);
       } finally {
@@ -83,40 +81,39 @@ export default function AddAppointment() {
     })();
   }, []);
 
-  // 2) CUANDO CAMBIA CLIENTE, CARGAR MASCOTAS DE ÉL
   useEffect(() => {
-    if (!client) {
+    if (!clientId) {
       setClientPets([]);
       return;
     }
     setLoadingClientPets(true);
-    const q = query(collection(db, 'pets'), where('userName', '==', client));
-    const unsub = onSnapshot(q, snap => {
-      setClientPets(snap.docs.map(d => (d.data().name as string)));
-      setLoadingClientPets(false);
-    }, err => {
-      console.error(err);
-      setLoadingClientPets(false);
-    });
-    return () => unsub();
-  }, [client]);
+    (async () => {
+      try {
+        const all = await getAllPets();
+        const filtered = all.filter(p => p.userId === clientId);
+        setClientPets(filtered.map(p => p.name));
+      } catch (e) {
+        console.error(e);
+        setClientPets([]);
+      } finally {
+        setLoadingClientPets(false);
+      }
+    })();
+  }, [clientId]);
 
-  // Opciones de motivo
   const reasonOptions = ['Baño', 'Consulta', 'Control'];
 
-  // Horas cada 30min entre 08:00–17:30
   const timeOptions = useMemo(() => {
     const arr: string[] = [];
     for (let h = 8; h <= 17; h++) {
       ['00','30'].forEach(m => {
         if (h === 17 && m === '30') arr.push('17:30');
-        else if (h < 17)        arr.push(`${String(h).padStart(2,'0')}:${m}`);
+        else if (h < 17) arr.push(`${String(h).padStart(2,'0')}:${m}`);
       });
     }
     return arr;
   }, []);
 
-  // Conflicto de horarios
   const filteredTimeOptions = timeOptions.map(t => {
     const conflict = dates.some(d =>
       d.date === date &&
@@ -132,41 +129,37 @@ export default function AddAppointment() {
     return { time: t, disabled: conflict };
   });
 
-  // Validación general
   const isValid =
     Boolean(client && pet && reason && date && time) &&
     !filteredTimeOptions.find(o => o.time === time && o.disabled);
 
-  // Fecha mínima = hoy
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm   = String(today.getMonth()+1).padStart(2,'0');
   const dd   = String(today.getDate()).padStart(2,'0');
   const minDate = `${yyyy}-${mm}-${dd}`;
 
-  // Enviar a Firestore
   const handleDate = async () => {
     setErrorMsg('');
     if (filteredTimeOptions.find(o => o.time === time && o.disabled)) {
-      setErrorMsg(
-        reason === 'Baño'
-          ? 'Ya hay un baño agendado para este día y hora.'
-          : 'Ya hay una consulta o control agendado para este día y hora.'
-      );
+      setErrorMsg(reason === 'Baño'
+        ? 'Ya hay un baño agendado para este día y hora.'
+        : 'Ya hay una consulta o control agendado para este día y hora.');
       return;
     }
     try {
       setLoading(true);
-      // Aquí usamos directamente addDoc para poder asignar `userName: client`
       const docRef = await addDoc(collection(db,'dates'), {
+        userId: clientId,           // ← ✅ Clave para que el usuario vea la cita
         userName: client,
-        petName:  pet,
+        petName: pet,
         reason,
-        notes:    extra,
+        notes: extra,
         date,
         time,
         createdAt: serverTimestamp(),
-      });
+});
+
       router.replace(`${Routes.QR}?id=${docRef.id}`);
     } catch (e) {
       console.error(e);
@@ -177,42 +170,27 @@ export default function AddAppointment() {
   };
 
   const tabs = [
-    { icon: homeIcon,    label: 'Home',    route: Routes.Home   },
-    { icon: scanIcon,    label: 'Escanear', route: Routes.Home   },
-    { icon: mediaIcon,   label: 'Media',   route: Routes.Media  },
-    { icon: perfilIcon,  label: 'Perfil',  route: Routes.Perfil },
+    { icon: homeIcon, label: 'Home', route: Routes.Home },
+    { icon: scanIcon, label: 'Escanear', route: Routes.Home },
+    { icon: mediaIcon, label: 'Media', route: Routes.Media },
+    { icon: perfilIcon, label: 'Perfil', route: Routes.Perfil },
   ];
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.form}>
-        {/* <- atrás */}
         <TouchableOpacity style={styles.goBack} onPress={() => router.back()}>
           <Image source={goBackIcon} style={styles.goBackIcon} />
         </TouchableOpacity>
-
-        {/* Huella fondo */}
         <Image source={pawIcon} style={styles.paw} />
-
         <Text style={styles.title}>Añadir cita</Text>
 
-        {/* Error banner */}
-        {errorMsg ? (
-          <View style={styles.errorBanner}>
-            <Text style={styles.errorText}>{errorMsg}</Text>
-          </View>
-        ) : null}
+        {errorMsg && <View style={styles.errorBanner}><Text style={styles.errorText}>{errorMsg}</Text></View>}
 
         {/* CLIENTE */}
         <Text style={styles.label}>Cliente</Text>
         <View style={styles.selectorWrapper}>
-          <TouchableOpacity
-            style={styles.selectorContainer}
-            onPress={() => setShowClientDropdown(v => !v)}
-          >
+          <TouchableOpacity style={styles.selectorContainer} onPress={() => setShowClientDropdown(v => !v)}>
             <Text style={client ? styles.selectorText : styles.selectorPlaceholder}>
               {client || 'Selecciona cliente'}
             </Text>
@@ -227,13 +205,14 @@ export default function AddAppointment() {
                       key={i}
                       style={styles.option}
                       onPress={() => {
-                        setClient(c);
+                        setClient(c.name);
+                        setClientId(c.id);
                         setShowClientDropdown(false);
                         setPet('');
                         setErrorMsg('');
                       }}
                     >
-                      <Text style={styles.optionText}>{c}</Text>
+                      <Text style={styles.optionText}>{c.name}</Text>
                     </TouchableOpacity>
                 ))}
             </View>
@@ -243,11 +222,7 @@ export default function AddAppointment() {
         {/* MASCOTA */}
         <Text style={styles.label}>Mascota</Text>
         <View style={styles.selectorWrapper}>
-          <TouchableOpacity
-            style={styles.selectorContainer}
-            onPress={() => setShowPetDropdown(v => !v)}
-            disabled={!client}
-          >
+          <TouchableOpacity style={styles.selectorContainer} onPress={() => setShowPetDropdown(v => !v)} disabled={!client}>
             <Text style={pet ? styles.selectorText : styles.selectorPlaceholder}>
               {pet || 'Selecciona mascota'}
             </Text>
@@ -257,7 +232,7 @@ export default function AddAppointment() {
             <View style={styles.dropdown}>
               {loadingClientPets
                 ? <ActivityIndicator size="small" color="#30C5FF" style={{ margin:16 }}/>
-                : clientPets.map((p,i) => (
+                : clientPets.map((p, i) => (
                     <TouchableOpacity
                       key={i}
                       style={styles.option}
@@ -274,7 +249,7 @@ export default function AddAppointment() {
           )}
         </View>
 
-        {/* MOTIVO */}
+                {/* MOTIVO DE LA CITA */}
         <Text style={styles.label}>Motivo de la cita</Text>
         <View style={styles.selectorWrapper}>
           <TouchableOpacity
@@ -305,7 +280,7 @@ export default function AddAppointment() {
           )}
         </View>
 
-        {/* RECOMENDACIONES */}
+        {/* RECOMENDACIONES ADICIONALES */}
         <Text style={styles.label}>Recomendaciones adicionales</Text>
         <TextInput
           style={[styles.input, styles.extraInput]}
@@ -362,7 +337,7 @@ export default function AddAppointment() {
           </TouchableOpacity>
           {showTimeDropdown && (
             <View style={styles.dropdown}>
-              {filteredTimeOptions.map(({ time:t, disabled }, i) => (
+              {filteredTimeOptions.map(({ time: t, disabled }, i) => (
                 <TouchableOpacity
                   key={i}
                   style={styles.option}
@@ -382,21 +357,20 @@ export default function AddAppointment() {
           )}
         </View>
 
-        {/* BOTÓN */}
+        {/* BOTÓN DE CONFIRMACIÓN */}
         <TouchableOpacity
           style={[styles.button, (!isValid || loading) && styles.buttonDisabled]}
           disabled={!isValid || loading}
           onPress={handleDate}
         >
           {loading
-            ? <ActivityIndicator color="#FFF"/>
+            ? <ActivityIndicator color="#FFF" />
             : <Text style={styles.buttonText}>Generar confirmación</Text>
           }
         </TouchableOpacity>
-      </ScrollView>
 
-      {/* Bottom Tabs */}
-       <BottomTabs />
+      </ScrollView>
+      <BottomTabs />
     </KeyboardAvoidingView>
   );
 }

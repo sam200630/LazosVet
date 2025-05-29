@@ -121,15 +121,17 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   backIcon: {
-    width: 24,
-    height: 24,
+    width: 50,
+    height: 50,
     tintColor: "#FFF",
+    marginTop: 100,
   },
   permissionContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
+    marginTop: 10,
   },
   permissionText: {
     fontFamily: "Poppins-Regular",

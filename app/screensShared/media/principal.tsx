@@ -1,6 +1,9 @@
-// app/screensShared/media/principal.tsx
-
-import React, { useContext, useState, useEffect } from 'react';
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useRef
+} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -8,18 +11,20 @@ import {
   Text,
   Image,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  TextInput,
   ActivityIndicator,
-  Platform,
+  StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MediaContext, MediaPost } from '../../../context/mediaContext';
-import BottomTabs   from '../../../components/bottonsTab';
-import styles       from '../../../styles/media/principal';
-import lupaIcon     from '../../../assets/images/lupa.png';
-import plusIcon     from '../../../assets/images/+.png';
-import likeIcon     from '../../../assets/images/like.png';
-import commentIcon  from '../../../assets/images/coments.png';
-import { Routes }   from '../../../route';
+import BottomTabs from '../../../components/bottonsTab';
+import styles from '../../../styles/media/principal';
+import lupaIcon    from '../../../assets/images/lupa.png';
+import plusIcon    from '../../../assets/images/+.png';
+import likeIcon    from '../../../assets/images/like.png';
+import gustaIcon   from '../../../assets/images/gusta.png';
+import { Routes }  from '../../../route';
 import defaultAvatar from '../../../assets/images/default-profile.jpeg';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../../../utils/FirebaseConfig';
@@ -32,16 +37,22 @@ interface PostWithUser extends MediaPost {
 export default function MediaPrincipal() {
   const router = useRouter();
   const { posts, loading } = useContext(MediaContext);
-  const [tab, setTab] = useState<'publicaciones' | 'preguntas'>('publicaciones');
   const [feed, setFeed] = useState<PostWithUser[]>([]);
   const [fetching, setFetching] = useState(true);
 
-  // Cada vez que cambian los posts, traemos name/photo de cada userId
+  // Search
+  const [searchActive, setSearchActive] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Likes
+  const [liked, setLiked] = useState<Set<string>>(new Set());
+
+  // Load user info
   useEffect(() => {
-    let isActive = true;
+    let active = true;
     (async () => {
       setFetching(true);
-      const enriched: PostWithUser[] = await Promise.all(
+      const enriched = await Promise.all(
         posts.map(async p => {
           try {
             const snap = await getDoc(doc(db, 'users', p.userId));
@@ -60,15 +71,20 @@ export default function MediaPrincipal() {
           }
         })
       );
-      if (isActive) {
+      if (active) {
         setFeed(enriched);
         setFetching(false);
       }
     })();
-    return () => {
-      isActive = false;
-    };
+    return () => { active = false; };
   }, [posts]);
+
+  // Filtered feed
+  const displayed = searchQuery
+    ? feed.filter(p =>
+        p.userName.toLowerCase().includes(searchQuery.toLowerCase().trim())
+      )
+    : feed;
 
   if (loading || fetching) {
     return (
@@ -82,41 +98,14 @@ export default function MediaPrincipal() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => {/* TODO: búsqueda */}}>
+        <TouchableOpacity onPress={() => setSearchActive(true)}>
           <Image source={lupaIcon} style={styles.icon} />
         </TouchableOpacity>
 
         <View style={styles.tabSelector}>
-          <TouchableOpacity
-            style={[
-              styles.tabButton,
-              tab === 'publicaciones' && styles.tabButtonActive,
-            ]}
-            onPress={() => setTab('publicaciones')}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                tab === 'publicaciones' && styles.tabTextActive,
-              ]}
-            >
+          <TouchableOpacity style={[styles.tabButton, styles.tabButtonActive]}>
+            <Text style={[styles.tabText, styles.tabTextActive]}>
               Publicaciones
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.tabButton,
-              tab === 'preguntas' && styles.tabButtonActive,
-            ]}
-            onPress={() => setTab('preguntas')}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                tab === 'preguntas' && styles.tabTextActive,
-              ]}
-            >
-              P&R
             </Text>
           </TouchableOpacity>
         </View>
@@ -126,42 +115,33 @@ export default function MediaPrincipal() {
         </TouchableOpacity>
       </View>
 
+      {/* Search input full width */}
+      {searchActive && (
+        <View style={searchStyles.searchContainer}>
+          <TextInput
+            style={searchStyles.searchInputFull}
+            placeholder="Buscar usuario..."
+            placeholderTextColor="#999"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoFocus
+          />
+        </View>
+      )}
+
       {/* Feed */}
       <ScrollView contentContainerStyle={styles.feed}>
-        {feed.map(post => (
-          <View key={post.id} style={styles.post}>
-            <View style={styles.postHeader}>
-              <Image
-                source={
-                  post.userPhoto
-                    ? { uri: post.userPhoto }
-                    : defaultAvatar
-                }
-                style={styles.avatarPlaceholder}
-              />
-              <Text style={styles.username}>@{post.userName}</Text>
-            </View>
-
-            <Image
-              source={{ uri: post.imageUrl }}
-              style={styles.postImagePlaceholder}
-            />
-
-            <View style={styles.postActions}>
-              <View style={styles.actionItem}>
-                <Image source={likeIcon} style={styles.actionIcon} />
-                <Text style={styles.actionText}>10</Text>
-              </View>
-              <View style={styles.actionItem}>
-                <Image source={commentIcon} style={styles.actionIcon} />
-                <Text style={styles.actionText}>1</Text>
-              </View>
-            </View>
-
-            <Text style={styles.description}>
-              {post.description}
-            </Text>
-          </View>
+        {displayed.map(post => (
+          <PostItem
+            key={post.id}
+            post={post}
+            liked={liked.has(post.id)}
+            onToggleLike={() => {
+              const next = new Set(liked);
+              next.has(post.id) ? next.delete(post.id) : next.add(post.id);
+              setLiked(next);
+            }}
+          />
         ))}
       </ScrollView>
 
@@ -170,3 +150,82 @@ export default function MediaPrincipal() {
     </SafeAreaView>
   );
 }
+
+function PostItem({
+  post,
+  liked,
+  onToggleLike,
+}: {
+  post: PostWithUser;
+  liked: boolean;
+  onToggleLike: () => void;
+}) {
+  const lastTap = useRef<number>(0);
+  const [showOverlay, setShowOverlay] = useState(false);
+
+  const handleTap = () => {
+    const now = Date.now();
+    if (now - lastTap.current < 300) {
+      onToggleLike();
+      setShowOverlay(true);
+      setTimeout(() => setShowOverlay(false), 1500);
+    }
+    lastTap.current = now;
+  };
+
+  return (
+    <View style={styles.post}>
+      <View style={styles.postHeader}>
+        <Image
+          source={post.userPhoto ? { uri: post.userPhoto } : defaultAvatar}
+          style={styles.avatarPlaceholder}
+        />
+        <Text style={styles.username}>@{post.userName}</Text>
+      </View>
+
+      <TouchableWithoutFeedback onPress={handleTap}>
+        <View>
+          <Image
+            source={{ uri: post.imageUrl }}
+            style={styles.postImagePlaceholder}
+            resizeMode="cover"
+          />
+          {showOverlay && (
+            <Image
+              source={gustaIcon}
+              style={StyleSheet.flatten([styles.overlay])}
+            />
+          )}
+        </View>
+      </TouchableWithoutFeedback>
+
+      <View style={styles.postActions}>
+        <TouchableOpacity onPress={onToggleLike}>
+          <Image
+            source={liked ? gustaIcon : likeIcon}
+            style={styles.actionIcon}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.description}>{post.description}</Text>
+    </View>
+  );
+}
+
+const searchStyles = StyleSheet.create({
+  searchContainer: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  searchInputFull: {
+    width: '100%',
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#DDD',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    fontFamily: 'Poppins-Regular',
+    color: '#101419',
+  },
+});

@@ -28,15 +28,17 @@ import correoIcon   from '../../../assets/images/correo.png';
 import pawSmallIcon from '../../../assets/images/mascota.png';
 import editIcon     from '../../../assets/images/editar.png';
 import trashIcon    from '../../../assets/images/basura.png';
+// Iconos de tabs (se conservan aunque no se usen aquí)
 import homeIcon     from '../../../assets/images/home.png';
 import petbotIcon   from '../../../assets/images/petbot.png';
 import mediaIcon    from '../../../assets/images/media.png';
 import perfilIcon   from '../../../assets/images/perfil.png';
+
 import { Routes } from '../../../route';
 
 export default function Perfil() {
   const router = useRouter();
-  const { logout } = useContext(AuthContext);
+  const { logout, userType } = useContext(AuthContext);
   const { name, email, photoUrl, loading, refreshProfile } = useContext(ProfileContext);
   const { pets } = useContext(PetsContext);
 
@@ -103,6 +105,15 @@ export default function Perfil() {
     );
   }
 
+  // Determina la ruta de home según userType
+  const handleGoBack = () => {
+    if (userType === 'admin') {
+      router.replace(Routes.AdminHome);
+    } else {
+      router.replace(Routes.Home);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <CameraModal
@@ -111,7 +122,8 @@ export default function Perfil() {
         closeModal={() => setModalVisible(false)}
       />
 
-      <TouchableOpacity style={styles.goBack} onPress={() => router.replace(Routes.Home)}>
+      {/* Botón atrás con redirección condicional */}
+      <TouchableOpacity style={styles.goBack} onPress={handleGoBack}>
         <Image source={goBackIcon} style={styles.goBackIcon} />
       </TouchableOpacity>
 
@@ -130,7 +142,7 @@ export default function Perfil() {
           </TouchableOpacity>
         </View>
 
-        {/* Foto */}
+        {/* Foto de perfil */}
         <View style={styles.profilePicContainer}>
           <Image
             source={ photoUrl
@@ -154,7 +166,7 @@ export default function Perfil() {
           </View>
         </View>
 
-        {/* Mascotas */}
+        {/* Listado de mascotas */}
         <Text style={styles.sectionTitle}>Mis mascotas</Text>
         <View style={styles.petsCard}>
           {pets.length > 0
@@ -180,7 +192,7 @@ export default function Perfil() {
           }
         </View>
 
-        {/* Botones */}
+        {/* Botones de acción */}
         <TouchableOpacity style={styles.addPetButton} onPress={() => router.replace(Routes.AddMascota)}>
           <Text style={styles.addPetText}>+ Añadir mascota</Text>
         </TouchableOpacity>
